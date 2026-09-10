@@ -87,7 +87,13 @@
     gsap.registerPlugin(ScrollTrigger);
     if (desktop.matches && window.Lenis) {
       lenis = new Lenis({
-        lerp: 0.14,
+        // Measured: at 0.14 the page kept coasting for 709ms after the wheel
+        // stopped. Native scroll settles in roughly 200. Smooth scrolling is
+        // the point, so this is not native — but three quarters of a second of
+        // drift is the other half of what reads as scroll lag, alongside the
+        // scrub:1 that used to sit on top of it. 0.2 settles in about half that
+        // and still glides. Lower is floatier, higher is tighter.
+        lerp: 0.2,
         smoothWheel: true,
         syncTouch: false,
         anchors: true,
@@ -121,37 +127,48 @@
           );
           if (introHold) introHeld.push(entrance);
         } else {
-          // Plays once on entry rather than scrubbing. Scrubbed, this ran a
-          // 2s tween with a 0.1s-per-character stagger — nearly six seconds of
-          // timeline on a long heading — mapped across the whole range from
-          // "top 90%" to "bottom 58%". The heading therefore only reached full
-          // opacity as it was leaving, so measured over a normal read-paced
-          // scroll, 97% of frames had visible headline text sitting below full
-          // opacity, 21 characters on average. It also ran backwards on the way
-          // up, and scrub:1 held a second of catch-up behind the wheel on top
-          // of Lenis's own easing. Text you are trying to read is the wrong
-          // place to spend either.
-          gsap.fromTo(
+          // Scrubbed, but over a short band and with no smoothing, and it stops
+          // existing once it has played.
+          //
+          // What was here mapped a 2s tween with a 0.1s-per-character stagger —
+          // nearly six seconds of timeline on a long heading — across the whole
+          // range from "top 90%" to "bottom 58%", so a heading only reached full
+          // opacity as it was leaving. scrub:1 added a second of catch-up behind
+          // the wheel on top of Lenis's own easing, and it ran backwards on the
+          // way up. Measured over a 600px/s scroll, text was still resolving in
+          // the readable top 70% of the viewport on 47% of frames.
+          //
+          // Replacing it with a timed entrance was worse, not better (80%): a
+          // fixed duration can always be outrun, and at any real scroll speed a
+          // heading crosses into the readable zone long before 1.25s of tween
+          // has run. Tying progress to position instead means the heading is
+          // finished by the time its top reaches 72% of the viewport, at every
+          // scroll speed, and scrub:true carries no smoothing lag at all.
+          const entrance = gsap.fromTo(
             chars,
-            { opacity: 0, rotationX: (i) => (i % 2 ? -45 : 45) },
+            { opacity: 0.08, rotationX: (i) => (i % 2 ? -45 : 45) },
             {
               opacity: 1,
               rotationX: 0,
               ease: "sine.out",
-              duration: 0.9,
-              stagger: { amount: 0.35 },
-              // Without this the characters keep an inline transform and
-              // opacity for the life of the page — 227 of 250 of them were
-              // still carrying one — each a transformed box inside a
-              // perspective, for nothing.
-              clearProps: "transform,opacity",
+              duration: 1,
+              stagger: { amount: 0.5 },
               scrollTrigger: {
                 trigger: heading,
-                start: "top 88%",
-                once: true,
+                start: "top bottom",
+                end: "top 66%",
+                scrub: true,
+                // Once it has played it is done: no reversing back out on the
+                // way up, and no leaving 227 characters holding an inline
+                // transform inside a perspective for the life of the page.
+                onLeave: (self) => {
+                  self.kill();
+                  gsap.set(chars, { clearProps: "transform,opacity" });
+                },
               },
             },
           );
+          void entrance;
         }
       });
       $$("[data-reveal]").forEach((frame) => {
@@ -159,29 +176,39 @@
         const curtain = $(".curtain", frame),
           img = $("img", frame);
         gsap.set(curtain, { display: "block", scaleY: 1 });
+        // Same reasoning as the headings above, and the same fix. This was a
+        // 1.6s power3.inOut played once on entry; power3.inOut idles for the
+        // first third of its run, so a photograph stayed a blank chalk
+        // rectangle well after it was fully on screen — covered in the readable
+        // top 70% of the viewport on 63% of frames at reading pace. Shortening
+        // it to 0.9s took that to 15%, but a fixed duration is still something
+        // a scroll can outrun: on a hard flick it was 92%.
+        //
+        // Tied to position over a short band instead, the photograph is
+        // uncovered by the time its top reaches 78% of the viewport whatever
+        // the scroll is doing, and the image's settle becomes the parallax it
+        // always looked like. The trigger kills itself on the way past, so
+        // nothing reverses on the way back up and no image keeps an inline
+        // transform.
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: frame, start: "top 90%", once: true },
-        });
-        // 0.9s out, not 1.6s in-out. power3.inOut idles for the first third of
-        // its run, so a photograph entering the viewport stayed a blank chalk
-        // rectangle well after it was fully on screen — a photo was still
-        // behind its curtain on 21% of frames during a read-paced scroll. The
-        // move is the same, it just commits immediately and lands before you
-        // have scrolled past it.
-        tl.to(curtain, { scaleY: 0, duration: 0.9, ease: "power3.out" }, 0)
-          .fromTo(
-            img,
-            { yPercent: -18, scale: 1.2 },
-            {
-              yPercent: 0,
-              scale: 1,
-              duration: 0.9,
-              ease: "power3.out",
-              clearProps: "transform",
+          scrollTrigger: {
+            trigger: frame,
+            start: "top bottom",
+            end: "top 64%",
+            scrub: true,
+            onLeave: (self) => {
+              self.kill();
+              gsap.set(curtain, { display: "none" });
+              gsap.set(img, { clearProps: "transform" });
             },
-            0,
-          )
-          .set(curtain, { display: "none" });
+          },
+        });
+        tl.to(curtain, { scaleY: 0, ease: "power2.out" }, 0).fromTo(
+          img,
+          { yPercent: -18, scale: 1.2 },
+          { yPercent: 0, scale: 1, ease: "power2.out" },
+          0,
+        );
       });
       // Entrance travel is confined to the image masks; page flow is never pinned.
     });

@@ -121,20 +121,34 @@
           );
           if (introHold) introHeld.push(entrance);
         } else {
+          // Plays once on entry rather than scrubbing. Scrubbed, this ran a
+          // 2s tween with a 0.1s-per-character stagger — nearly six seconds of
+          // timeline on a long heading — mapped across the whole range from
+          // "top 90%" to "bottom 58%". The heading therefore only reached full
+          // opacity as it was leaving, so measured over a normal read-paced
+          // scroll, 97% of frames had visible headline text sitting below full
+          // opacity, 21 characters on average. It also ran backwards on the way
+          // up, and scrub:1 held a second of catch-up behind the wheel on top
+          // of Lenis's own easing. Text you are trying to read is the wrong
+          // place to spend either.
           gsap.fromTo(
             chars,
-            { opacity: 0.08, rotationX: (i) => (i % 2 ? -45 : 45) },
+            { opacity: 0, rotationX: (i) => (i % 2 ? -45 : 45) },
             {
               opacity: 1,
               rotationX: 0,
               ease: "sine.out",
-              duration: 2,
-              stagger: 0.1,
+              duration: 0.9,
+              stagger: { amount: 0.35 },
+              // Without this the characters keep an inline transform and
+              // opacity for the life of the page — 227 of 250 of them were
+              // still carrying one — each a transformed box inside a
+              // perspective, for nothing.
+              clearProps: "transform,opacity",
               scrollTrigger: {
                 trigger: heading,
-                start: "top 90%",
-                end: "bottom 58%",
-                scrub: 1,
+                start: "top 88%",
+                once: true,
               },
             },
           );
@@ -146,17 +160,23 @@
           img = $("img", frame);
         gsap.set(curtain, { display: "block", scaleY: 1 });
         const tl = gsap.timeline({
-          scrollTrigger: { trigger: frame, start: "top 93%", once: true },
+          scrollTrigger: { trigger: frame, start: "top 90%", once: true },
         });
-        tl.to(curtain, { scaleY: 0, duration: 1.6, ease: "power3.inOut" }, 0)
+        // 0.9s out, not 1.6s in-out. power3.inOut idles for the first third of
+        // its run, so a photograph entering the viewport stayed a blank chalk
+        // rectangle well after it was fully on screen — a photo was still
+        // behind its curtain on 21% of frames during a read-paced scroll. The
+        // move is the same, it just commits immediately and lands before you
+        // have scrolled past it.
+        tl.to(curtain, { scaleY: 0, duration: 0.9, ease: "power3.out" }, 0)
           .fromTo(
             img,
             { yPercent: -18, scale: 1.2 },
             {
               yPercent: 0,
               scale: 1,
-              duration: 1.6,
-              ease: "power3.inOut",
+              duration: 0.9,
+              ease: "power3.out",
               clearProps: "transform",
             },
             0,

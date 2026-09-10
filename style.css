@@ -1,17 +1,4 @@
-@font-face {
-  font-family: Zodiak;
-  src: url("/kleif-rossar-preview/assets/fonts/Zodiak-Light.woff2") format("woff2");
-  font-weight: 300;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: Zodiak;
-  src: url("/kleif-rossar-preview/assets/fonts/Zodiak-LightItalic.woff2") format("woff2");
-  font-weight: 300;
-  font-style: italic;
-  font-display: swap;
-}
+@import url("/kleif-rossar-preview/assets/fonts/melodrama/css/melodrama.css");
 @font-face {
   font-family: Supreme;
   src: url("/kleif-rossar-preview/assets/fonts/Supreme-Regular.woff2") format("woff2");
@@ -32,7 +19,7 @@
   --line: #d9dcd1;
   --gutter: 20px;
   --header: 80px;
-  --serif: Zodiak, Georgia, serif;
+  --display: "Melodrama-Variable", Georgia, serif;
   --sans: Supreme, Arial, sans-serif;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
@@ -109,16 +96,18 @@ p + p {
 h1,
 h2,
 h3 {
-  font-family: var(--serif);
-  font-weight: 300;
-  line-height: 1.12;
-  letter-spacing: -0.045em;
+  font-family: var(--display);
+  font-weight: 400;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 h3 {
   font-size: clamp(27px, 2.6vw, 40px);
 }
 em {
-  font-weight: 300;
+  font-style: normal;
+  font-weight: inherit;
 }
 img {
   display: block;
@@ -426,7 +415,7 @@ section[id] {
   color: var(--moss);
 }
 .editorial-wordmark {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 25px;
   display: flex;
   align-items: center;
@@ -442,7 +431,7 @@ section[id] {
   background: var(--line);
 }
 .editorial-wordmark.vogue {
-  font-family: Georgia, serif;
+  font-family: var(--display);
   font-size: 32px;
   position: relative;
   gap: 20px;
@@ -514,7 +503,7 @@ section[id] {
   align-items: center;
   color: #fff;
   font-size: 25px;
-  font-family: var(--serif);
+  font-family: var(--display);
   z-index: 2;
 }
 .house-tall:after {
@@ -712,7 +701,7 @@ section[id] {
   gap: 25px;
 }
 .nav-group > p {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 27px;
   margin-bottom: 15px;
   letter-spacing: -0.04em;
@@ -817,7 +806,7 @@ section[id] {
   margin-bottom: 10px;
 }
 .menu-groups .nav-group > a {
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 23px;
   line-height: 1.2;
   letter-spacing: -0.045em;
@@ -1129,7 +1118,7 @@ html[data-intro] .intro-mark .logo {
 }
 .house-facts span {
   font-size: clamp(30px, 3.3vw, 50px);
-  font-family: var(--serif);
+  font-family: var(--display);
   letter-spacing: -0.05em;
   color: var(--moss);
 }
@@ -1188,7 +1177,7 @@ html[data-intro] .intro-mark .logo {
   display: flex;
   align-items: center;
   gap: 50px;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: clamp(40px, 5.5vw, 85px);
   letter-spacing: -0.05em;
 }
@@ -1398,7 +1387,7 @@ html[data-intro] .intro-mark .logo {
 }
 .contact-email {
   display: block;
-  font-family: var(--serif);
+  font-family: var(--display);
   font-size: 38px;
   letter-spacing: -0.04em;
   margin: 22px 0 5px;
@@ -1548,7 +1537,7 @@ html[data-intro] .intro-mark .logo {
   margin: 0;
 }
 .travel-times strong {
-  font: 300 30px var(--serif);
+  font: 300 30px var(--display);
   letter-spacing: -0.04em;
 }
 .travel-times span {

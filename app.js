@@ -184,27 +184,55 @@
         // -18% and scaled down from 1.2 — two movements to read at once, on
         // every image, the whole way down the page.
         //
-        // Still tied to scroll position over the same short band, for the same
+        // Tied to scroll position rather than given a duration, for the same
         // reason as the headings: a duration can be outrun, a position cannot,
-        // so it is right at any scroll speed and complete before the image is
-        // anything you would call on screen.
+        // so this is right at any scroll speed.
         //
-        // The 1.05 is not a move, it is the blur's own edge. A blurred element
-        // samples transparency from outside itself, and .media clips at its
-        // border, so at rest the photograph would carry a soft vignette all
-        // round. Oversizing it by roughly twice the blur radius keeps that
-        // fringe outside the frame; it lands back at 1 exactly as the blur
-        // reaches 0, so there is nothing left to see.
-        gsap.set(img, { opacity: 0, filter: "blur(16px)", scale: 1.05 });
+        // Three things had made it invisible. `power2.out` on a scrub is
+        // front-loaded — a quarter of the way through the band it was already
+        // about 60% resolved — so `none` here, and the scroll does the pacing
+        // evenly across the whole travel. The band ended at "top 64%", which
+        // put nearly all of it below the fold before you were looking at the
+        // photograph. And starting at opacity 0 meant the only part you could
+        // see was the tail.
+        //
+        // It now starts at 0.45 and 22px: the photograph is never a blank
+        // rectangle, it is present from the first frame and out of focus, and
+        // it pulls into focus across the lower half of the screen. That is
+        // also why widening the band is safe in a way it would not have been
+        // with the old chalk curtain — an unresolved image here still reads as
+        // a photograph, not as a missing one.
+        //
+        // Both numbers come off the frame rather than being fixed, because a
+        // radius that reads as "softly out of focus" on a 760px plate is most
+        // of a 226px card on a phone. 3% of the shorter side lands around 22px
+        // on the big ones and 7px on the small ones, which looks like the same
+        // photograph out of focus at either size.
+        //
+        // The oversize is not a move, it is the blur's own edge. A blurred
+        // element samples transparency from outside itself, and .media clips at
+        // its border, so at rest the photograph would carry a soft vignette all
+        // round. Twice the radius over the shorter side keeps that fringe
+        // outside the frame; it lands back at 1 exactly as the blur reaches 0,
+        // so there is nothing left to see.
+        const box = frame.getBoundingClientRect(),
+          shortSide = Math.max(120, Math.min(box.width || 400, box.height || 400)),
+          blur = Math.round(Math.min(24, Math.max(7, shortSide * 0.03))),
+          guard = 1 + (blur * 2) / shortSide;
+        gsap.set(img, {
+          opacity: 0.45,
+          filter: `blur(${blur}px)`,
+          scale: guard,
+        });
         gsap.to(img, {
           opacity: 1,
           filter: "blur(0px)",
           scale: 1,
-          ease: "power2.out",
+          ease: "none",
           scrollTrigger: {
             trigger: frame,
             start: "top bottom",
-            end: "top 64%",
+            end: "top 48%",
             scrub: true,
             // will-change holds a compositor layer, so it belongs to the
             // photograph that is actually resolving — not to all thirteen on

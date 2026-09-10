@@ -314,14 +314,6 @@ section[id] {
   height: 100%;
   object-fit: cover;
 }
-.curtain {
-  display: none;
-  position: absolute;
-  inset: 0;
-  background: var(--chalk);
-  transform-origin: top;
-  pointer-events: none;
-}
 .hero {
   height: calc(100svh - var(--header) - 20px);
   min-height: 530px;
@@ -464,19 +456,55 @@ section[id] {
   font-size: 10px;
   letter-spacing: 0.02em;
 }
-.houses-triptych {
+/* An editorial header, then the two houses. The row used to be three equal
+   columns with a third photograph floating in the middle one at its own size,
+   introducing the two it was competing with. The heading now spans the section
+   above a rule, the way the rest of the site opens a section, and the pair
+   below it is the only imagery. */
+.houses-head {
   display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
+  gap: 40px 60px;
+  align-items: end;
+  padding-bottom: 30px;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 48px;
+}
+.houses-head .display {
+  font-size: clamp(40px, 5.6vw, 88px);
+  margin: 0 0 16px;
+}
+.houses-head p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 15px;
+  color: var(--moss);
+}
+.houses-head-aside {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 20px;
+  padding-bottom: 4px;
+}
+.houses-pair {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 25px;
-  height: min(75vh, 780px);
-  min-height: 490px;
+  /* start, not stretch: the offset below is what stops a matched pair reading
+     as two cells of a table. */
+  align-items: start;
+}
+.houses-pair > .house-tall:last-child {
+  margin-top: 72px;
 }
 .house-tall {
   position: relative;
   min-width: 0;
 }
 .house-tall > .media {
-  height: 100%;
+  height: auto;
+  aspect-ratio: 4 / 5;
 }
 .house-tall > span {
   position: absolute;
@@ -496,33 +524,6 @@ section[id] {
   border-radius: 0 0 5px 5px;
   background: linear-gradient(transparent, rgba(0, 0, 0, 0.45));
   pointer-events: none;
-}
-.houses-middle {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  min-width: 0;
-}
-.houses-middle > .media {
-  height: 60%;
-  width: 78%;
-  margin-bottom: 28px;
-}
-.houses-middle > .display {
-  font-size: clamp(35px, 4.2vw, 68px);
-  margin-bottom: 12px;
-}
-.houses-caption {
-  display: flex;
-  justify-content: space-between;
-  gap: 35px;
-  margin-top: 24px;
-  font-size: 14px;
-  color: var(--moss);
-}
-.houses-caption p {
-  max-width: 390px;
-  margin: 0;
 }
 .centered-intro {
   max-width: 590px;
@@ -1592,6 +1593,11 @@ html[data-intro] .intro-mark .logo {
   transform: none !important;
   opacity: 1 !important;
 }
+.no-motion [data-reveal] img {
+  transform: none !important;
+  opacity: 1 !important;
+  filter: none !important;
+}
 @media (hover: hover) and (pointer: fine) {
   .button:hover {
     background: var(--ink);
@@ -2030,55 +2036,39 @@ html[data-intro] .intro-mark .logo {
   .editorial-divider {
     height: 32px;
   }
-  /* Both houses, side by side, under the heading that promises two of them.
-     The previous mobile layout gave the row a fixed height and dropped the
+  /* The header stacks and the two houses stay a pair. Before this section was
+     rebuilt, the mobile layout gave the row a fixed height and dropped the
      second house to make it fit, so a section titled "Two houses. One farm."
-     showed one house and no route to Kleif Barn anywhere on a phone. The row
-     is now intrinsic: the heading block takes the full width above, and the
-     two houses share it below as a matched pair. */
-  .houses-triptych {
-    grid-template-columns: 1fr 1fr;
+     showed one house and a phone had no route to Kleif Barn at all. */
+  .houses-head {
+    grid-template-columns: 1fr;
+    gap: 22px;
+    align-items: start;
+    padding-bottom: 22px;
+    margin-bottom: 26px;
+  }
+  .houses-head .display {
+    font-size: clamp(30px, 8vw, 48px);
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .houses-head p {
+    font-size: 14px;
+  }
+  .houses-head-aside {
+    gap: 16px;
+    padding-bottom: 0;
+  }
+  .houses-pair {
     gap: 12px;
-    height: auto;
-    max-height: none;
-    min-height: 0;
   }
-  /* Explicit rows, not auto-placement: the heading block sits between the two
-     houses in source order, so left to itself the grid puts one house above it
-     and one below. */
-  .houses-middle {
-    grid-column: 1 / -1;
-    grid-row: 1;
-  }
-  .houses-triptych > .house-tall:first-child {
-    grid-column: 1;
-    grid-row: 2;
-  }
-  .houses-triptych > .house-tall:last-child {
-    display: block;
-    grid-column: 2;
-    grid-row: 2;
+  /* No stagger at this width — it only costs height and the pair already reads
+     as a pair. */
+  .houses-pair > .house-tall:last-child {
+    margin-top: 0;
   }
   .house-tall > .media {
-    /* The cards carried their height from the row; with an intrinsic row they
-       need one of their own. */
-    height: auto;
     aspect-ratio: 3 / 4;
-  }
-  .houses-middle > .media {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 16 / 10;
-    margin-bottom: 24px;
-  }
-  .houses-middle > .display {
-    font-size: clamp(27px, 6.1vw, 43px);
-    line-height: 1.1;
-    margin-bottom: 8px;
-  }
-  .houses-middle > .text-link {
-    font-size: 12px;
-    gap: 8px;
   }
   .house-tall > span {
     /* Two names now share the width one had, and each still has to clear its
@@ -2090,15 +2080,6 @@ html[data-intro] .intro-mark .logo {
   .house-tall > span svg {
     width: 16px;
     flex: none;
-  }
-  .houses-caption {
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 22px;
-    font-size: 13px;
-  }
-  .houses-caption p {
-    max-width: 350px;
   }
   .centered-intro {
     margin-bottom: 40px;
@@ -2642,8 +2623,10 @@ html[data-intro] .intro-mark .logo {
     opacity: 1 !important;
     transform: none !important;
   }
-  .curtain {
-    display: none !important;
+  [data-reveal] img {
+    opacity: 1 !important;
+    filter: none !important;
+    transform: none !important;
   }
 }
 .no-motion *,

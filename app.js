@@ -76,8 +76,13 @@
       heading.removeAttribute("aria-label");
     });
     originalHeadings.clear();
-    $$(".curtain").forEach((el) => {
-      el.style.display = "none";
+    // The image carries the reveal now, so nothing may leave one hidden or
+    // blurred — turning motion off mid-page has to hand back a finished page.
+    $$("[data-reveal] img").forEach((el) => {
+      el.style.opacity = "";
+      el.style.filter = "";
+      el.style.transform = "";
+      el.style.willChange = "";
     });
   }
   function setupMotion() {
@@ -173,42 +178,47 @@
       });
       $$("[data-reveal]").forEach((frame) => {
         if (frame.getBoundingClientRect().bottom < 0) return;
-        const curtain = $(".curtain", frame),
-          img = $("img", frame);
-        gsap.set(curtain, { display: "block", scaleY: 1 });
-        // Same reasoning as the headings above, and the same fix. This was a
-        // 1.6s power3.inOut played once on entry; power3.inOut idles for the
-        // first third of its run, so a photograph stayed a blank chalk
-        // rectangle well after it was fully on screen — covered in the readable
-        // top 70% of the viewport on 63% of frames at reading pace. Shortening
-        // it to 0.9s took that to 15%, but a fixed duration is still something
-        // a scroll can outrun: on a hard flick it was 92%.
+        const img = $("img", frame);
+        // The photograph resolves into focus instead of arriving from
+        // somewhere. It was a chalk curtain wiping up while the image slid
+        // -18% and scaled down from 1.2 — two movements to read at once, on
+        // every image, the whole way down the page.
         //
-        // Tied to position over a short band instead, the photograph is
-        // uncovered by the time its top reaches 78% of the viewport whatever
-        // the scroll is doing, and the image's settle becomes the parallax it
-        // always looked like. The trigger kills itself on the way past, so
-        // nothing reverses on the way back up and no image keeps an inline
-        // transform.
-        const tl = gsap.timeline({
+        // Still tied to scroll position over the same short band, for the same
+        // reason as the headings: a duration can be outrun, a position cannot,
+        // so it is right at any scroll speed and complete before the image is
+        // anything you would call on screen.
+        //
+        // The 1.05 is not a move, it is the blur's own edge. A blurred element
+        // samples transparency from outside itself, and .media clips at its
+        // border, so at rest the photograph would carry a soft vignette all
+        // round. Oversizing it by roughly twice the blur radius keeps that
+        // fringe outside the frame; it lands back at 1 exactly as the blur
+        // reaches 0, so there is nothing left to see.
+        gsap.set(img, { opacity: 0, filter: "blur(16px)", scale: 1.05 });
+        gsap.to(img, {
+          opacity: 1,
+          filter: "blur(0px)",
+          scale: 1,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: frame,
             start: "top bottom",
             end: "top 64%",
             scrub: true,
+            // will-change holds a compositor layer, so it belongs to the
+            // photograph that is actually resolving — not to all thirteen on
+            // the page for the whole visit.
+            onEnter: () => gsap.set(img, { willChange: "opacity, filter" }),
             onLeave: (self) => {
               self.kill();
-              gsap.set(curtain, { display: "none" });
-              gsap.set(img, { clearProps: "transform" });
+              // Blur is paint-level work; it must not outlive the reveal.
+              gsap.set(img, {
+                clearProps: "opacity,filter,transform,willChange",
+              });
             },
           },
         });
-        tl.to(curtain, { scaleY: 0, ease: "power2.out" }, 0).fromTo(
-          img,
-          { yPercent: -18, scale: 1.2 },
-          { yPercent: 0, scale: 1, ease: "power2.out" },
-          0,
-        );
       });
       // Entrance travel is confined to the image masks; page flow is never pinned.
     });

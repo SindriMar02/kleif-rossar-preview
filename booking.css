@@ -1,0 +1,741 @@
+/* Sindri's minimal header: retain the reference's air, remove its boxed controls. */
+.site-header > .brand {
+  left: var(--gutter);
+  transform: none;
+  top: 13px;
+}
+.site-header .logo {
+  height: 53px;
+}
+.header-left {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  gap: 35px;
+}
+.header-right {
+  margin-left: auto;
+  gap: 22px;
+}
+.header-enquiry {
+  border: 0;
+  border-radius: 0;
+  padding-inline: 0;
+  min-width: 140px;
+  gap: 20px;
+}
+.menu-toggle {
+  border: 0;
+  width: 44px;
+  border-radius: 0;
+}
+.header-enquiry:hover {
+  background: transparent;
+  color: var(--moss);
+}
+.rate-band {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 35px;
+  margin: 0 7% 100px;
+  padding: 35px 0;
+  border-block: 1px solid var(--line);
+}
+.rate-band h2 {
+  font-size: 40px;
+  margin-bottom: 18px;
+}
+.rate-band h2 > span {
+  font: 14px var(--sans);
+  letter-spacing: 0;
+}
+.rate-band p:not(.eyebrow) {
+  font-size: 13px;
+  max-width: 470px;
+  color: var(--moss);
+}
+.rate-band .eyebrow {
+  margin-bottom: 15px;
+}
+.rate-source {
+  display: inline-block;
+  font-size: 12px;
+  text-decoration: underline;
+  margin-top: 12px;
+}
+.booking-intro {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 10%;
+  align-items: end;
+  margin-top: 50px;
+  margin-bottom: 65px;
+  padding: 0 3%;
+}
+.booking-intro .display {
+  font-size: clamp(58px, 6.2vw, 104px);
+  color: var(--moss);
+}
+.booking-intro > div:last-child {
+  padding-bottom: 12px;
+}
+.booking-intro > div:last-child > p {
+  font-size: 15px;
+}
+.preview-label {
+  display: inline-flex;
+  font-size: 11px;
+  color: var(--moss);
+  padding: 9px 0;
+  border-bottom: 1px solid var(--line);
+  margin-top: 20px;
+  letter-spacing: 0.02em;
+}
+.booking-layout {
+  display: grid;
+  grid-template-columns: 32% 1fr;
+  gap: 6%;
+  align-items: start;
+  margin-top: 0;
+  padding-inline: 3%;
+}
+.booking-house {
+  background: var(--chalk);
+  border-radius: 5px;
+  overflow: hidden;
+  position: sticky;
+  top: 105px;
+}
+.booking-house > img {
+  width: 100%;
+  height: 24vw;
+  max-height: 385px;
+  object-fit: cover;
+}
+.booking-house-copy {
+  padding: 27px 30px 30px;
+}
+.booking-house h2 {
+  font-size: 40px;
+  margin-bottom: 20px;
+}
+.booking-house .eyebrow {
+  font-size: 10px;
+  margin-bottom: 15px;
+}
+.booking-house-copy > p:not(.eyebrow) {
+  font-size: 14px;
+}
+.booking-house-copy > p.booking-source {
+  font-size: 11px;
+  line-height: 1.65;
+  color: var(--moss);
+  margin-top: 18px;
+}
+.booking-source a {
+  text-decoration: underline;
+}
+.booking-price {
+  font: 300 32px var(--serif);
+  letter-spacing: -0.045em;
+  display: block;
+  margin-top: 25px;
+}
+.booking-price + span {
+  font-size: 12px;
+  color: var(--moss);
+}
+.booking-house .text-link {
+  font-size: 13px;
+  margin-top: 22px;
+  width: 100%;
+}
+.house-choices {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0;
+}
+.house-choices legend,
+.calendar-title > p,
+.booking-guests > label {
+  font-size: 15px;
+  margin-bottom: 18px;
+}
+.house-choices legend {
+  color: var(--moss);
+  font-size: 11px;
+  width: 100%;
+}
+.house-choices legend > span {
+  font-size: 15px;
+  color: var(--ink);
+  margin-left: 15px;
+}
+.house-choices > div {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 9px;
+}
+.house-choices label {
+  position: relative;
+  cursor: pointer;
+  min-width: 0;
+}
+.house-choices input {
+  position: absolute;
+  opacity: 0;
+  width: 1px;
+  height: 1px;
+}
+.house-choices label > span {
+  display: block;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 14px 12px;
+  font-size: 14px;
+  transition:
+    background-color 180ms ease,
+    border-color 180ms ease;
+}
+.house-choices small {
+  display: block;
+  font-size: 10px;
+  color: var(--moss);
+  margin-top: 5px;
+}
+.house-choices input:checked + span {
+  background: var(--chalk);
+  border-color: var(--moss);
+}
+.house-choices input:focus-visible + span {
+  outline: 2px solid var(--moss);
+  outline-offset: 4px;
+}
+.calendar-section {
+  border-top: 1px solid var(--line);
+  margin-top: 30px;
+  padding-top: 25px;
+}
+.calendar-title {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.calendar-title > p {
+  margin: 0;
+}
+.calendar-title > p > span,
+.booking-guests > label > span {
+  font-size: 11px;
+  color: var(--moss);
+  margin-right: 15px;
+}
+.calendar-title .quiet-button {
+  font-size: 11px;
+  min-height: 44px;
+}
+.calendar-section > p#calendar-instruction {
+  font-size: 12px;
+  color: var(--moss);
+  margin-top: 13px;
+  min-height: 38px;
+}
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin: 10px 0 5px;
+  gap: 15px;
+}
+.calendar-nav .circle-button {
+  width: 44px;
+  height: 44px;
+  font-size: 19px;
+}
+.calendar-nav > span {
+  font-size: 10px;
+  color: var(--moss);
+}
+.calendar-months {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 25px;
+  min-height: 340px;
+}
+.calendar-months table {
+  table-layout: fixed;
+  border-collapse: separate;
+  border-spacing: 0 3px;
+  width: 100%;
+  align-self: start;
+}
+.calendar-months caption {
+  font: 300 24px var(--serif);
+  letter-spacing: -0.04em;
+  padding: 10px 0 20px;
+  text-align: center;
+}
+.calendar-months th {
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--moss);
+  height: 30px;
+}
+.calendar-months td {
+  height: 42px;
+  text-align: center;
+  padding: 0;
+  font-size: 13px;
+}
+.calendar-months td button {
+  width: 100%;
+  height: 42px;
+  min-width: 30px;
+  position: relative;
+  padding: 0;
+  border-radius: 50%;
+  font-size: 13px;
+}
+.calendar-months td button:disabled {
+  opacity: 0.3;
+  text-decoration: line-through;
+}
+.calendar-months td.in-range {
+  background: #e9ecdf;
+}
+.calendar-months td.range-start {
+  background: linear-gradient(to right, transparent 50%, #e9ecdf 50%);
+  border-radius: 50% 0 0 50%;
+}
+.calendar-months td.range-end {
+  background: linear-gradient(to left, transparent 50%, #e9ecdf 50%);
+  border-radius: 0 50% 50% 0;
+}
+.calendar-months td.selected button {
+  background: var(--moss);
+  color: #fff;
+}
+.calendar-months td.today:not(.selected) button:after {
+  content: "";
+  position: absolute;
+  bottom: 5px;
+  left: calc(50% - 1.5px);
+  height: 3px;
+  width: 3px;
+  background: var(--moss);
+  border-radius: 50%;
+}
+.calendar-date-inputs {
+  display: grid;
+  grid-template-columns: 1fr 20px 1fr auto;
+  gap: 15px;
+  align-items: center;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  padding: 14px 16px;
+  margin-top: 18px;
+}
+.calendar-date-inputs label {
+  display: block;
+  font-size: 10px;
+  color: var(--moss);
+  margin-bottom: 4px;
+}
+.calendar-date-inputs input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  font-size: 13px;
+  padding: 4px 0;
+  min-height: 30px;
+  max-width: 160px;
+}
+.calendar-date-inputs > span {
+  color: var(--moss);
+  font-size: 12px;
+}
+.calendar-date-inputs #night-count {
+  font-size: 10px;
+  border-left: 1px solid var(--line);
+  padding-left: 15px;
+  white-space: nowrap;
+}
+.calendar-disclaimer {
+  font-size: 11px;
+  color: var(--moss);
+  line-height: 1.6;
+  margin-top: 13px;
+}
+.booking-guests {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid var(--line);
+  margin-top: 28px;
+  padding-top: 25px;
+  gap: 20px;
+}
+.booking-guests > label {
+  margin: 0;
+}
+.guest-stepper {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.guest-stepper button {
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 20px;
+}
+.guest-stepper input {
+  border: 0;
+  background: transparent;
+  width: 40px;
+  padding: 5px 0;
+  text-align: center;
+  font-size: 16px;
+  -moz-appearance: textfield;
+}
+.guest-stepper input::-webkit-inner-spin-button {
+  appearance: none;
+}
+.booking-summary {
+  background: var(--chalk);
+  padding: 22px;
+  border-radius: 4px;
+  margin-top: 25px;
+}
+.booking-summary > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+}
+.booking-summary > div > span {
+  font-size: 12px;
+  max-width: 180px;
+}
+.booking-summary strong {
+  font: 300 28px var(--serif);
+  letter-spacing: -0.05em;
+  white-space: nowrap;
+}
+.booking-summary > p {
+  font-size: 11px;
+  color: var(--moss);
+  margin-top: 12px;
+  max-width: 540px;
+}
+.booking-continue {
+  width: 100%;
+  background: var(--moss);
+  border-color: var(--moss);
+  color: #fff;
+  margin-top: 18px;
+}
+.booking-bottom-note {
+  text-align: center;
+}
+.booking-notes {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 50px;
+  border-top: 1px solid var(--line);
+  padding: 40px 3% 0;
+}
+.booking-notes h2 {
+  font-size: 29px;
+  margin-bottom: 20px;
+}
+.booking-notes p {
+  font-size: 14px;
+}
+.booking-notes .text-link {
+  font-size: 13px;
+  margin-top: 15px;
+}
+@media (hover: hover) and (pointer: fine) {
+  .calendar-months td:not(.selected) button:hover:not(:disabled) {
+    background: var(--chalk);
+  }
+  .house-choices input:not(:checked) + span:hover {
+    border-color: var(--moss);
+  }
+}
+@media (max-width: 1100px) {
+  .booking-layout {
+    grid-template-columns: 29% 1fr;
+    gap: 4%;
+    padding-inline: 0;
+  }
+  .booking-house-copy {
+    padding: 23px 20px;
+  }
+  .booking-house h2 {
+    font-size: 33px;
+  }
+  .booking-price {
+    font-size: 27px;
+  }
+  .calendar-months {
+    gap: 18px;
+  }
+  .calendar-months td,
+  .calendar-months td button {
+    height: 38px;
+  }
+  .calendar-date-inputs {
+    gap: 10px;
+    padding: 12px;
+  }
+  .booking-summary strong {
+    font-size: 25px;
+  }
+  .booking-intro {
+    padding-inline: 0;
+  }
+  .booking-notes {
+    padding-inline: 0;
+    gap: 30px;
+  }
+}
+@media (max-width: 850px) {
+  .booking-layout {
+    grid-template-columns: 1fr;
+  }
+  .booking-house {
+    display: grid;
+    grid-template-columns: 35% 1fr;
+    position: static;
+    margin-bottom: 35px;
+  }
+  .booking-house > img {
+    height: 100%;
+    max-height: none;
+  }
+  .booking-house-copy {
+    padding: 25px;
+  }
+  .booking-house .booking-source {
+    max-width: 300px;
+  }
+  .booking-house .text-link {
+    width: auto;
+  }
+  .calendar-months td,
+  .calendar-months td button {
+    height: 44px;
+  }
+  .calendar-months {
+    min-height: 360px;
+  }
+  .booking-intro .display {
+    font-size: 57px;
+  }
+  .rate-band {
+    margin-inline: 2%;
+  }
+  .rate-band h2 {
+    font-size: 34px;
+  }
+}
+@media (max-width: 700px) {
+  .site-header > .brand {
+    top: 10px;
+  }
+  .site-header .logo {
+    height: 44px;
+  }
+  .header-right {
+    gap: 12px;
+  }
+  .header-enquiry {
+    min-width: 113px;
+    font-size: 12px;
+    gap: 12px;
+  }
+  .menu-toggle {
+    width: 44px;
+    min-height: 44px;
+  }
+  .header-left {
+    display: none;
+  }
+  .rate-band {
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0 15px 70px;
+    gap: 25px;
+    padding: 25px 0;
+  }
+  .rate-band h2 {
+    font-size: 32px;
+  }
+  .rate-band h2 > span {
+    font-size: 12px;
+  }
+  .booking-intro {
+    grid-template-columns: 1fr;
+    gap: 27px;
+    margin-top: 35px;
+    margin-bottom: 35px;
+    padding-inline: 10px;
+  }
+  .booking-intro .display {
+    font-size: 52px;
+  }
+  .booking-intro > div:last-child {
+    padding: 0;
+  }
+  .booking-intro > div:last-child > p {
+    font-size: 14px;
+  }
+  .preview-label {
+    font-size: 10px;
+    margin-top: 12px;
+  }
+  .booking-layout {
+    padding-inline: 8px;
+    margin-top: 0;
+    gap: 0;
+  }
+  .booking-house {
+    grid-template-columns: 30% 1fr;
+    margin-bottom: 40px;
+  }
+  .booking-house-copy {
+    padding: 20px;
+  }
+  .booking-house-copy > p:not(.eyebrow) {
+    font-size: 12px;
+  }
+  .booking-house h2 {
+    font-size: 32px;
+    margin-bottom: 14px;
+  }
+  .booking-house .eyebrow {
+    font-size: 9px;
+  }
+  .booking-price {
+    font-size: 26px;
+    margin-top: 18px;
+  }
+  .booking-price + span {
+    font-size: 11px;
+  }
+  .booking-house-copy > p.booking-source {
+    font-size: 10px;
+    margin-top: 13px;
+  }
+  .booking-house .text-link {
+    font-size: 12px;
+    margin-top: 12px;
+  }
+  .house-choices > div {
+    gap: 6px;
+  }
+  .house-choices label > span {
+    font-size: 12px;
+    padding: 12px 9px;
+  }
+  .house-choices small {
+    font-size: 9px;
+  }
+  .calendar-months {
+    grid-template-columns: 1fr;
+    min-height: 330px;
+    max-width: 470px;
+    margin-inline: auto;
+  }
+  .calendar-months caption {
+    font-size: 27px;
+    padding-bottom: 18px;
+  }
+  .calendar-months th {
+    font-size: 11px;
+  }
+  .calendar-months td,
+  .calendar-months td button {
+    height: 44px;
+  }
+  .calendar-months td button {
+    font-size: 14px;
+    max-width: 44px;
+  }
+  .calendar-months td.range-start {
+    border-radius: 25px 0 0 25px;
+  }
+  .calendar-months td.range-end {
+    border-radius: 0 25px 25px 0;
+  }
+  .calendar-nav {
+    margin-top: 5px;
+  }
+  .calendar-nav .circle-button {
+    width: 44px;
+    height: 44px;
+  }
+  .calendar-section > p#calendar-instruction {
+    min-height: 40px;
+  }
+  .calendar-date-inputs {
+    grid-template-columns: 1fr 15px 1fr;
+    gap: 7px;
+    padding: 14px 12px;
+  }
+  .calendar-date-inputs input {
+    font-size: 14px;
+    max-width: 150px;
+  }
+  .calendar-date-inputs #night-count {
+    grid-column: 1/-1;
+    text-align: center;
+    border: 0;
+    border-top: 1px solid var(--line);
+    padding: 10px 0 0;
+    margin-top: 5px;
+    font-size: 11px;
+  }
+  .booking-guests > label {
+    font-size: 14px;
+  }
+  .guest-stepper {
+    gap: 5px;
+  }
+  .guest-stepper button {
+    width: 44px;
+    height: 44px;
+  }
+  .booking-summary {
+    padding: 20px 15px;
+  }
+  .booking-summary > div {
+    align-items: flex-start;
+    gap: 12px;
+  }
+  .booking-summary > div > span {
+    font-size: 11px;
+    max-width: 130px;
+  }
+  .booking-summary strong {
+    font-size: 23px;
+  }
+  .booking-continue {
+    font-size: 14px;
+    padding: 12px 20px;
+  }
+  .booking-notes {
+    grid-template-columns: 1fr;
+    gap: 35px;
+    padding: 35px 18px 0;
+  }
+  .booking-notes h2 {
+    font-size: 28px;
+  }
+}

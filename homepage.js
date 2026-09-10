@@ -367,4 +367,29 @@
     document.querySelector("#home-email-ready").hidden = false;
     link.focus();
   });
+
+  // ---- The docked header -------------------------------------------------
+  // Appears once the film is half behind you and leaves again on the way back
+  // up. An IntersectionObserver on a sentinel sitting at the hero's midpoint,
+  // so nothing at all runs per frame while scrolling; the class it toggles is
+  // what the CSS transitions off.
+  const dock = document.querySelector("[data-home-dock]"),
+    dockLine = hero.querySelector(".home-dock-line");
+  if (dock && dockLine) {
+    // One menu and one set of open/close behaviour: the dock's button forwards
+    // to the hero header's own, which app.js has already wired and which this
+    // file relocates into the dialog while it is open.
+    dock
+      .querySelector(".home-dock-toggle")
+      ?.addEventListener("click", () => menuButton.click());
+    new IntersectionObserver(
+      ([entry]) => {
+        dock.classList.toggle(
+          "is-docked",
+          !entry.isIntersecting && entry.boundingClientRect.top < 0,
+        );
+      },
+      { threshold: 0 },
+    ).observe(dockLine);
+  }
 })();

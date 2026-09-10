@@ -12,6 +12,13 @@
   const originalHeadings = new Map();
   const photoData = JSON.parse($("#photo-data").textContent);
   const noMotion = () => reduced.matches || motionOff;
+  // Set once, at parse time: the opening is decided before this file runs, by
+  // the inline boot script that put the attribute on <html>.
+  const introHold = document.documentElement.hasAttribute("data-intro") ? 1 : 0;
+  // Held tweens the opening is responsible for starting. If it ends early —
+  // skipped or failsafed — a headline still sitting on a one-second delay would
+  // leave the hero blank for most of a second after the page is uncovered.
+  const introHeld = [];
   const motionButton = $(".motion-toggle");
 
   function updateMotionButton() {
@@ -99,7 +106,7 @@
         const chars = splitHeading(heading);
         const first = rect.top < innerHeight * 0.9;
         if (first) {
-          gsap.fromTo(
+          const entrance = gsap.fromTo(
             chars,
             { opacity: 0, rotationX: (i) => (i % 2 ? -45 : 45) },
             {
@@ -108,10 +115,11 @@
               duration: 2,
               ease: "sine.out",
               stagger: { amount: 0.4 },
-              delay: 0.08,
+              delay: introHold + 0.08,
               clearProps: "transform,opacity",
             },
           );
+          if (introHold) introHeld.push(entrance);
         } else {
           gsap.fromTo(
             chars,
@@ -368,10 +376,118 @@
       }
     });
   }
+  function runIntro() {
+    const root = document.documentElement;
+    if (!root.hasAttribute("data-intro")) return;
+    const curtain = $(".intro"),
+      mark = $(".intro-mark"),
+      markLogo = $(".logo", mark),
+      seat = $(".site-header .brand .logo"),
+      hero = $(".hero-photo");
+    let released = false,
+      tl = null;
+    // Every path out of the opening ends here, and it is safe to call twice.
+    // The page is held by a stylesheet rule, so a starved rAF in a background
+    // tab, a hero that never decodes or a missing GSAP must not be able to
+    // leave a visitor under a blank chalk field.
+    const release = () => {
+      if (released) return;
+      released = true;
+      clearTimeout(failsafe);
+      impatient.forEach((type) => removeEventListener(type, skip));
+      root.removeAttribute("data-intro");
+      lenis?.start();
+      // Manual restoration was for the opening only; leaving it set would stop
+      // the browser restoring scroll on a later back navigation.
+      try {
+        history.scrollRestoration = "auto";
+      } catch {}
+      introHeld.forEach((tween) => {
+        if (!tween.isActive() && tween.progress() === 0) tween.delay(0);
+      });
+      try {
+        sessionStorage.setItem("kleif-intro", "seen");
+      } catch {}
+    };
+    // Anyone who reaches for the page has said they are done watching. Send the
+    // timeline to its end rather than cutting, so the hero lands where the
+    // opening was going to put it either way.
+    const impatient = ["pointerdown", "keydown", "wheel", "touchstart"];
+    const skip = () => {
+      if (released) return;
+      // Run the rest of the opening out fast rather than cutting it: a curtain
+      // that disappears mid-sweep reads as a glitch, not as a skip.
+      if (tl && typeof gsap !== "undefined")
+        gsap.to(tl, {
+          progress: 1,
+          duration: 0.25,
+          ease: "power2.out",
+          onComplete: release,
+        });
+      else release();
+    };
+    impatient.forEach((type) =>
+      addEventListener(type, skip, { passive: true }),
+    );
+    const failsafe = setTimeout(release, 4000);
+    try {
+      history.scrollRestoration = "manual";
+    } catch {}
+    scrollTo(0, 0);
+    lenis?.stop();
+    // Open on a finished frame: an opening that lifts to reveal a blank hero
+    // and a fallback typeface is worse than no opening. Capped, because a slow
+    // connection must not extend the hold indefinitely.
+    Promise.race([
+      Promise.all([
+        document.fonts.ready,
+        hero?.decode ? hero.decode().catch(() => {}) : Promise.resolve(),
+      ]),
+      new Promise((resolve) => setTimeout(resolve, 900)),
+    ]).then(() => {
+      if (released) return;
+      if (typeof gsap === "undefined") return release();
+      tl = gsap.timeline();
+      if (seat && markLogo) {
+        const from = markLogo.getBoundingClientRect(),
+          to = seat.getBoundingClientRect();
+        tl.to(
+          markLogo,
+          {
+            x: to.left + to.width / 2 - (from.left + from.width / 2),
+            y: to.top + to.height / 2 - (from.top + from.height / 2),
+            scale: to.width / from.width,
+            duration: 0.85,
+            ease: "power3.inOut",
+          },
+          0,
+        );
+      }
+      tl.to(curtain, { scaleY: 0, duration: 0.8, ease: "power3.inOut" }, 0.45);
+      if (hero)
+        tl.fromTo(
+          hero,
+          { scale: 1.12 },
+          {
+            scale: 1,
+            duration: 0.85,
+            ease: "power3.inOut",
+            clearProps: "transform",
+          },
+          0.4,
+        );
+      tl.to(mark, { autoAlpha: 0, duration: 0.25, ease: "none" }, 0.85).add(
+        release,
+        1.25,
+      );
+    });
+  }
+
   // Restore native scrolling and animation state across browser back/forward cache.
   addEventListener("pagehide", resetMotion);
   addEventListener("pageshow", (event) => {
     if (event.persisted) setupMotion();
   });
   setupMotion();
+  runIntro();
 })();

@@ -882,6 +882,53 @@ section[id] {
   }
 }
 
+/* ---- The opening ----------------------------------------------------------
+   A chalk field carrying the wordmark is the first frame. The mark takes its
+   seat in the header, the field is drawn down off the page from the top so the
+   header clears first and the mark lands on something real, and the hero
+   settles out of a slight push-in behind it. It is the site's own curtain
+   grammar — scaleY on a flat chalk plane, power3.inOut — raised to the page.
+
+   The photo curtains lift upward off an image; this one is drawn downward,
+   because a page is read from the top and the mark's destination is up there.
+
+   Everything is keyed on html[data-intro], which only the inline boot script
+   sets, and only for a first arrival in the session with motion enabled. No
+   attribute means display:none on both elements and no held page — which is
+   also what a visitor with JS disabled gets, and what the 5s failsafe restores
+   if the bundle never runs. */
+.intro,
+.intro-mark {
+  display: none;
+}
+html[data-intro] {
+  overflow: hidden;
+}
+html[data-intro] .intro {
+  display: block;
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: var(--chalk);
+  transform-origin: bottom center;
+  pointer-events: none;
+}
+html[data-intro] .intro-mark {
+  display: grid;
+  place-items: center;
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  pointer-events: none;
+}
+html[data-intro] .intro-mark .logo {
+  height: clamp(104px, 19vh, 184px);
+  /* The mark is measured and flown to the header's own logo at runtime, so it
+     needs a predictable box and a centre to scale about. */
+  transform-origin: center center;
+  will-change: transform;
+}
+
 /* ---- Menu reveal ----------------------------------------------------------
    The panel expands down over the page instead of cross-fading onto it, so the
    movement says where the menu came from, and the backdrop fades in underneath
@@ -1983,19 +2030,45 @@ section[id] {
   .editorial-divider {
     height: 32px;
   }
+  /* Both houses, side by side, under the heading that promises two of them.
+     The previous mobile layout gave the row a fixed height and dropped the
+     second house to make it fit, so a section titled "Two houses. One farm."
+     showed one house and no route to Kleif Barn anywhere on a phone. The row
+     is now intrinsic: the heading block takes the full width above, and the
+     two houses share it below as a matched pair. */
   .houses-triptych {
-    grid-template-columns: 55% 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 12px;
-    height: 110vw;
-    max-height: 640px;
-    min-height: 400px;
+    height: auto;
+    max-height: none;
+    min-height: 0;
+  }
+  /* Explicit rows, not auto-placement: the heading block sits between the two
+     houses in source order, so left to itself the grid puts one house above it
+     and one below. */
+  .houses-middle {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+  .houses-triptych > .house-tall:first-child {
+    grid-column: 1;
+    grid-row: 2;
   }
   .houses-triptych > .house-tall:last-child {
-    display: none;
+    display: block;
+    grid-column: 2;
+    grid-row: 2;
+  }
+  .house-tall > .media {
+    /* The cards carried their height from the row; with an intrinsic row they
+       need one of their own. */
+    height: auto;
+    aspect-ratio: 3 / 4;
   }
   .houses-middle > .media {
     width: 100%;
-    height: 54%;
+    height: auto;
+    aspect-ratio: 16 / 10;
     margin-bottom: 24px;
   }
   .houses-middle > .display {
@@ -2008,11 +2081,15 @@ section[id] {
     gap: 8px;
   }
   .house-tall > span {
-    inset: auto 14px 15px;
-    font-size: 24px;
+    /* Two names now share the width one had, and each still has to clear its
+       arrow. */
+    inset: auto 12px 13px;
+    font-size: clamp(15px, 4.4vw, 22px);
+    gap: 10px;
   }
   .house-tall > span svg {
-    width: 18px;
+    width: 16px;
+    flex: none;
   }
   .houses-caption {
     flex-direction: column;

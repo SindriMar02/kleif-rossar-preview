@@ -182,6 +182,9 @@
     lenis?.stop();
     $(".close-button", dialog)?.focus({ preventScroll: true });
   }
+  // The menu's exit is a CSS transition held open by allow-discrete on
+  // display/overlay, so a plain close still plays it and Escape needs no
+  // special case. See the menu reveal block in style.css.
   function closeDialog(dialog) {
     if (!dialog?.open) return;
     dialog.close();

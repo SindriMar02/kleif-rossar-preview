@@ -293,9 +293,14 @@ section[id] {
   height: 1px;
   background: currentColor;
 }
+/* The short rule is a full-width bar held back by scaleX rather than a narrower
+   one, so its hover state is a transform instead of a width: 30px right-aligned
+   at 0.8 lands on exactly the pixels width:24px + margin-left:6px did. */
 .menu-toggle span:last-child {
-  width: 24px;
-  margin-left: 6px;
+  width: 30px;
+  transform: scaleX(0.8);
+  transform-origin: right center;
+  transition: transform 220ms var(--ease-out);
 }
 .media {
   position: relative;
@@ -757,6 +762,9 @@ section[id] {
   background: var(--chalk);
   color: var(--ink);
   overflow: auto;
+  /* The panel scrolls on a short viewport; without this, reaching its end
+     hands the scroll to the page underneath it. */
+  overscroll-behavior: contain;
 }
 .menu-dialog::backdrop {
   background: #fff;
@@ -862,7 +870,7 @@ section[id] {
 .menu-photo img {
   object-position: 65% center;
 }
-.dialog-animate {
+.lightbox.dialog-animate {
   animation: dialog-in 240ms var(--ease-out);
 }
 @keyframes dialog-in {
@@ -871,6 +879,114 @@ section[id] {
   }
   to {
     opacity: 1;
+  }
+}
+
+/* ---- Menu reveal ----------------------------------------------------------
+   The panel expands down over the page instead of cross-fading onto it, so the
+   movement says where the menu came from, and the backdrop fades in underneath
+   it — left opaque it would whiten the page on frame one and there would be
+   nothing left to reveal. Contents settle in behind the leading edge a few
+   blocks at a time, so the eye lands on the groups first.
+
+   Transitions rather than keyframes, because a keyframed exit restarts from
+   fully-open: close the menu mid-entrance and the panel jumps down before it
+   goes back up. A transition retargets from wherever it currently is. Native
+   `allow-discrete` on display/overlay is what holds the dialog in the top layer
+   long enough for the exit to play, so dialog.close() stays a plain close and
+   Escape needs no special case.
+
+   Transform and opacity only: the panel is position:fixed at 100dvh, and
+   animating anything that lays out would re-run that measurement every frame.
+   Everything is gated on .dialog-animate, which app.js withholds for reduced
+   motion, the site's motion toggle, and keyboard activation. The lightbox keeps
+   the plain fade above — a photograph has nowhere to come from.
+
+   400ms is over the usual 300ms ceiling on purpose: the panel travels a whole
+   viewport height, and at 300ms that distance reads as a flicker rather than a
+   reveal. Leaving is 240ms — an exit that costs as much as the entrance reads
+   as the interface hesitating. */
+.menu-dialog.dialog-animate {
+  /* 101% rather than 100%: a fractional viewport height leaves a hairline of
+     the panel showing along the top edge at exactly 100%. */
+  transform: translate3d(0, -101%, 0);
+  transition:
+    transform 240ms var(--ease-out),
+    overlay 240ms var(--ease-out) allow-discrete,
+    display 240ms var(--ease-out) allow-discrete;
+}
+.menu-dialog.dialog-animate[open] {
+  transform: translate3d(0, 0, 0);
+  transition:
+    transform 400ms var(--ease-out),
+    overlay 400ms var(--ease-out) allow-discrete,
+    display 400ms var(--ease-out) allow-discrete;
+}
+.menu-dialog.dialog-animate::backdrop {
+  opacity: 0;
+  transition:
+    opacity 240ms var(--ease-out),
+    overlay 240ms var(--ease-out) allow-discrete,
+    display 240ms var(--ease-out) allow-discrete;
+}
+.menu-dialog.dialog-animate[open]::backdrop {
+  opacity: 1;
+  transition:
+    opacity 400ms var(--ease-out),
+    overlay 400ms var(--ease-out) allow-discrete,
+    display 400ms var(--ease-out) allow-discrete;
+}
+@starting-style {
+  .menu-dialog.dialog-animate[open] {
+    transform: translate3d(0, -101%, 0);
+  }
+  .menu-dialog.dialog-animate[open]::backdrop {
+    opacity: 0;
+  }
+}
+
+/* The contents only have an entrance. On the way out they are carried by the
+   panel, so there is no rule for them outside [open] and nothing to unwind. */
+.menu-dialog.dialog-animate[open] .menu-top > *,
+.menu-dialog.dialog-animate[open] .menu-groups .nav-group,
+.menu-dialog.dialog-animate[open] .menu-story,
+.menu-dialog.dialog-animate[open] .menu-contact,
+.menu-dialog.dialog-animate[open] .menu-photo {
+  opacity: 1;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 300ms var(--ease-out) var(--enter, 150ms),
+    transform 300ms var(--ease-out) var(--enter, 150ms);
+}
+.menu-dialog.dialog-animate[open] .menu-top > * {
+  --enter: 90ms;
+}
+.menu-dialog.dialog-animate[open] .menu-photo {
+  --enter: 130ms;
+}
+.menu-dialog.dialog-animate[open] .menu-groups .nav-group:nth-child(1) {
+  --enter: 150ms;
+}
+.menu-dialog.dialog-animate[open] .menu-groups .nav-group:nth-child(2) {
+  --enter: 195ms;
+}
+.menu-dialog.dialog-animate[open] .menu-groups .nav-group:nth-child(3) {
+  --enter: 240ms;
+}
+.menu-dialog.dialog-animate[open] .menu-story {
+  --enter: 200ms;
+}
+.menu-dialog.dialog-animate[open] .menu-contact {
+  --enter: 245ms;
+}
+@starting-style {
+  .menu-dialog.dialog-animate[open] .menu-top > *,
+  .menu-dialog.dialog-animate[open] .menu-groups .nav-group,
+  .menu-dialog.dialog-animate[open] .menu-story,
+  .menu-dialog.dialog-animate[open] .menu-contact,
+  .menu-dialog.dialog-animate[open] .menu-photo {
+    opacity: 0;
+    transform: translate3d(0, 15px, 0);
   }
 }
 .inner-hero {
@@ -1457,6 +1573,10 @@ section[id] {
   .filter-button:hover:not([aria-pressed="true"]) {
     background: var(--chalk);
   }
+  .menu-toggle:hover span:last-child,
+  .menu-toggle:focus-visible span:last-child {
+    transform: scaleX(1);
+  }
 }
 @media (min-width: 1800px) {
   main,
@@ -1757,8 +1877,8 @@ section[id] {
     width: 23px;
   }
   .menu-toggle span:last-child {
-    width: 18px;
-    margin-left: 5px;
+    width: 23px;
+    transform: scaleX(0.783);
   }
   .hero {
     height: calc(100svh - 77px);

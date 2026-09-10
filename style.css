@@ -2169,8 +2169,10 @@ html[data-intro] .intro-mark .logo {
     gap: 8px;
   }
   .circle-button {
-    width: 42px;
-    height: 42px;
+    /* 44, not 42: these are the only way to move the photo rail on a phone,
+       and they were two pixels under the minimum touch target. */
+    width: 44px;
+    height: 44px;
     font-size: 21px;
   }
   .photo-rail {

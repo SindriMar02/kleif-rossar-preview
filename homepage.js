@@ -8,19 +8,15 @@
   let pausedByVisitor = false,
     blockedByAutoplay = false,
     inView = true,
-    loaded = false,
     failed = false,
     openingHold = false;
   const motionAllowed = () =>
     !reduce.matches &&
     !document.documentElement.classList.contains("no-motion");
-  const connection = navigator.connection;
-  const compactFilm = matchMedia("(max-width: 760px)");
-  const filmSource = () =>
-    compactFilm.matches ||
-    ["slow-2g", "2g", "3g"].includes(connection?.effectiveType)
-      ? video.dataset.filmMobile
-      : video.dataset.filmSrc;
+  // The element carries autoplay and its own <source media> pair, so the film
+  // can start during parse with no JavaScript at all. This file no longer owns
+  // the source or the first play; it owns pausing, the visitor's toggle, and
+  // retrying when the browser refuses.
   function updateToggle() {
     toggle.setAttribute(
       "aria-label",
@@ -34,6 +30,13 @@
   function syncFilm() {
     if (!motionAllowed() || failed) {
       video.pause();
+      // autoplay is on the element now, so a reduced-motion visitor would keep
+      // pulling the file down in the background. Detach it.
+      if (!failed && video.networkState !== HTMLMediaElement.NETWORK_EMPTY) {
+        video.removeAttribute("autoplay");
+        video.querySelectorAll("source").forEach((n) => n.remove());
+        video.load();
+      }
       hero.classList.remove("has-film");
       toggle.hidden = true;
       return;
@@ -42,16 +45,6 @@
     if (pausedByVisitor || openingHold || !inView || document.hidden) {
       video.pause();
       return;
-    }
-    if (connection?.saveData && !loaded) {
-      pausedByVisitor = true;
-      updateToggle();
-      return;
-    }
-    if (!loaded) {
-      video.src = filmSource();
-      video.load();
-      loaded = true;
     }
     if (!video.paused) return;
     video.play().catch((error) => {
@@ -77,8 +70,8 @@
     hero.classList.add("has-film");
     updateToggle();
   });
-  // preload is none, so the first play() is attempted before a single byte has
-  // arrived. Try again the moment there is something to play.
+  // Belt and braces on top of the attribute: if the browser refused, try again
+  // as soon as there is something to play.
   video.addEventListener("loadeddata", syncFilm);
   video.addEventListener("canplay", syncFilm);
   // Last resort: iOS honours play() inside a user gesture even when it refused
@@ -99,11 +92,6 @@
   });
   toggle.addEventListener("click", () => {
     pausedByVisitor = !video.paused;
-    if (!pausedByVisitor && !loaded) {
-      video.src = filmSource();
-      video.load();
-      loaded = true;
-    }
     syncFilm();
   });
   reduce.addEventListener("change", syncFilm);

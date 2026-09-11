@@ -6,6 +6,7 @@
     toggle = hero.querySelector(".home-film-toggle");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)");
   let pausedByVisitor = false,
+    blockedByAutoplay = false,
     inView = true,
     loaded = false,
     failed = false,
@@ -61,14 +62,35 @@
         !motionAllowed()
       )
         return;
-      pausedByVisitor = true;
+      // The browser refusing is not the same as the visitor pausing, and this
+      // used to be recorded as the latter. Low Power Mode on iOS and a source
+      // that has not buffered yet both land here, and both recover on their own,
+      // but once pausedByVisitor was set syncFilm returned early for the rest of
+      // the visit and the film never started. Surface the control and keep
+      // trying instead of giving up.
+      blockedByAutoplay = true;
       updateToggle();
     });
   }
   video.addEventListener("playing", () => {
+    blockedByAutoplay = false;
     hero.classList.add("has-film");
     updateToggle();
   });
+  // preload is none, so the first play() is attempted before a single byte has
+  // arrived. Try again the moment there is something to play.
+  video.addEventListener("loadeddata", syncFilm);
+  video.addEventListener("canplay", syncFilm);
+  // Last resort: iOS honours play() inside a user gesture even when it refused
+  // the automatic attempt. Any touch anywhere starts it, and the listeners
+  // remove themselves once it is running.
+  const kickstart = () => {
+    if (!blockedByAutoplay || pausedByVisitor) return;
+    syncFilm();
+  };
+  ["pointerdown", "touchstart", "keydown"].forEach((type) =>
+    addEventListener(type, kickstart, { passive: true }),
+  );
   video.addEventListener("pause", updateToggle);
   video.addEventListener("error", () => {
     failed = true;

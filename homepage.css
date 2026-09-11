@@ -295,9 +295,16 @@ body[data-page="/kleif-rossar-preview/"] .menu-toggle[aria-expanded="true"] span
     height: 78px;
     padding: 0 22px;
   }
+  /* Full screen on a phone. The 85dvh cap reads as a dropdown on a wide screen
+     and as an unfinished panel on a narrow one, with the footer showing through
+     underneath it. The surface still descends from the top exactly as before. */
+  .home-menu {
+    height: 100dvh;
+    max-height: 100dvh;
+  }
   .home-menu-content {
     padding: 20px 22px 24px;
-    max-height: calc(85dvh - 78px);
+    max-height: calc(100dvh - 78px);
   }
   .home-menu .menu-groups {
     grid-template-columns: 1fr 1fr;
@@ -1290,6 +1297,13 @@ body[data-page="/kleif-rossar-preview/"] :focus-visible {
   }
   .home-dock-brand {
     justify-self: start;
+    /* The mark is 29x34 drawn, which is under the minimum touch target in both
+       directions. Pad the hit area out to 44 without changing what is on screen. */
+    display: inline-flex;
+    align-items: center;
+    min-width: 44px;
+    min-height: 44px;
+    margin-left: -7px;
   }
   .home-dock-brand .logo {
     height: 34px;

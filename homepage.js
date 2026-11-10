@@ -304,73 +304,6 @@
       document.querySelector("#home-space").value = a.dataset.enquireSpace;
     }),
   );
-  // Keep the actual two-line button in the same visual position: move that
-  // node into the native top-layer dialog, rather than swapping in an X glyph.
-  const menu = document.querySelector("#site-menu");
-  const menuButton = document.querySelector(".home-header .menu-toggle");
-  const buttonParent = menuButton.parentNode;
-  const buttonSeat = document.createElement("span");
-  buttonSeat.className = "home-menu-button-seat";
-  buttonSeat.setAttribute("aria-hidden", "true");
-  let menuClosing;
-  menuButton.setAttribute("aria-expanded", "false");
-  function finishMenuClose() {
-    clearTimeout(menuClosing);
-    if (buttonSeat.isConnected) buttonSeat.replaceWith(menuButton);
-    else buttonParent.append(menuButton);
-    menu.close();
-    document.body.classList.remove("dialog-open");
-    menuButton.focus({ preventScroll: true });
-  }
-  function closeHomeMenu(instant = false) {
-    clearTimeout(menuClosing);
-    menu.classList.toggle("is-instant", instant || !motionAllowed());
-    menu.classList.remove("is-expanded");
-    menuButton.setAttribute("aria-expanded", "false");
-    menuButton.setAttribute("aria-label", "Open menu");
-    if (instant || !motionAllowed()) finishMenuClose();
-    else menuClosing = setTimeout(finishMenuClose, 290);
-  }
-  menuButton.addEventListener(
-    "click",
-    (event) => {
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      if (menu.classList.contains("is-expanded")) {
-        closeHomeMenu(event.detail === 0);
-        return;
-      }
-      clearTimeout(menuClosing);
-      menu.classList.toggle(
-        "is-instant",
-        event.detail === 0 || !motionAllowed(),
-      );
-      if (menuButton.parentNode === buttonParent)
-        menuButton.replaceWith(buttonSeat);
-      menu.querySelector(".home-menu-control").append(menuButton);
-      if (!menu.open) menu.showModal();
-      document.body.classList.add("dialog-open");
-      void menu.offsetHeight;
-      menu.classList.add("is-expanded");
-      menuButton.setAttribute("aria-expanded", "true");
-      menuButton.setAttribute("aria-label", "Close menu");
-      menuButton.focus({ preventScroll: true });
-    },
-    true,
-  );
-  menu.addEventListener("cancel", (event) => {
-    event.preventDefault();
-    closeHomeMenu(true);
-  });
-  menu.addEventListener("click", (event) => {
-    if (event.target === menu) {
-      const r = menu.getBoundingClientRect();
-      if (event.clientY > r.bottom || event.clientY < r.top) closeHomeMenu();
-    }
-  });
-  menu
-    .querySelectorAll('a[href^="#"]')
-    .forEach((a) => a.addEventListener("click", () => closeHomeMenu(true)));
   const form = document.querySelector("#home-enquiry");
   form.addEventListener("submit", (event) => {
     event.preventDefault();
@@ -386,28 +319,4 @@
     link.focus();
   });
 
-  // ---- The docked header -------------------------------------------------
-  // Appears once the film is half behind you and leaves again on the way back
-  // up. An IntersectionObserver on a sentinel sitting at the hero's midpoint,
-  // so nothing at all runs per frame while scrolling; the class it toggles is
-  // what the CSS transitions off.
-  const dock = document.querySelector("[data-home-dock]"),
-    dockLine = hero.querySelector(".home-dock-line");
-  if (dock && dockLine) {
-    // One menu and one set of open/close behaviour: the dock's button forwards
-    // to the hero header's own, which app.js has already wired and which this
-    // file relocates into the dialog while it is open.
-    dock
-      .querySelector(".home-dock-toggle")
-      ?.addEventListener("click", () => menuButton.click());
-    new IntersectionObserver(
-      ([entry]) => {
-        dock.classList.toggle(
-          "is-docked",
-          !entry.isIntersecting && entry.boundingClientRect.top < 0,
-        );
-      },
-      { threshold: 0 },
-    ).observe(dockLine);
-  }
 })();

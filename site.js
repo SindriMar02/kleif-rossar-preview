@@ -21,6 +21,63 @@
     seq.observe(el);
   });
 
+  // ---- one header, one menu (moved from homepage.js so every page shares them) ----
+  const siteHeader = $(".site-header.home-header");
+  const sentinel = $(".home-dock-line");
+  if (siteHeader && sentinel) {
+    // homepage: the header stays see-through over the film and turns solid once half of it is behind you
+    new IntersectionObserver(([entry]) => siteHeader.classList.toggle("is-solid", !entry.isIntersecting && entry.boundingClientRect.top < 0), { threshold: 0 }).observe(sentinel);
+  }
+  const menu = $("#site-menu.home-menu");
+  const menuButton = $(".site-header .menu-toggle");
+  if (menu && menuButton) {
+    // the real two-line button moves into the top-layer dialog and turns into the X, so it never jumps
+    const buttonParent = menuButton.parentNode;
+    const seat = document.createElement("span");
+    seat.className = "home-menu-button-seat";
+    seat.setAttribute("aria-hidden", "true");
+    let closing;
+    menuButton.setAttribute("aria-expanded", "false");
+    const finish = () => {
+      clearTimeout(closing);
+      if (seat.isConnected) seat.replaceWith(menuButton); else buttonParent.append(menuButton);
+      menu.close();
+      document.body.classList.remove("dialog-open");
+      menuButton.focus({ preventScroll: true });
+    };
+    const closeMenu = (instant = false) => {
+      clearTimeout(closing);
+      menu.classList.toggle("is-instant", instant || still());
+      menu.classList.remove("is-expanded");
+      menuButton.setAttribute("aria-expanded", "false");
+      menuButton.setAttribute("aria-label", "Open menu");
+      if (instant || still()) finish(); else closing = setTimeout(finish, 290);
+    };
+    menuButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopImmediatePropagation(); // app.js's full-screen menu handler must not run
+      if (menu.classList.contains("is-expanded")) { closeMenu(event.detail === 0); return; }
+      clearTimeout(closing);
+      menu.classList.toggle("is-instant", event.detail === 0 || still());
+      if (menuButton.parentNode === buttonParent) menuButton.replaceWith(seat);
+      $(".home-menu-control", menu).append(menuButton);
+      if (!menu.open) menu.showModal();
+      document.body.classList.add("dialog-open");
+      void menu.offsetHeight;
+      menu.classList.add("is-expanded");
+      menuButton.setAttribute("aria-expanded", "true");
+      menuButton.setAttribute("aria-label", "Close menu");
+      menuButton.focus({ preventScroll: true });
+    }, true);
+    menu.addEventListener("cancel", (event) => { event.preventDefault(); closeMenu(true); });
+    menu.addEventListener("click", (event) => {
+      if (event.target !== menu) return;
+      const r = menu.getBoundingClientRect();
+      if (event.clientY > r.bottom || event.clientY < r.top) closeMenu();
+    });
+    $$('a[href^="#"]', menu).forEach((a) => a.addEventListener("click", () => closeMenu(true)));
+  }
+
   // ---- filters: gallery and reviews ----
   $$("[data-k-filter]").forEach((button) => {
     const section = button.closest("section");

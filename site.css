@@ -368,23 +368,6 @@ main > .gallery-section { padding-inline: var(--k-side); max-width: calc(var(--k
 .home-menu-name::before { inset: -9px 0; }
 .k-compare thead a::before, .contact-intro a::before { inset: -12px 0; }
 
-/* Menu button: two lines, no box, on every header (Sindri 10 Nov: "ugly button"), matching the homepage dock.
-   The menu's close button loses its box the same way. */
-.menu-toggle { width: 44px; height: 44px; border: 0; border-radius: 0; background: none; padding: 0; gap: 6px; cursor: pointer; }
-.menu-toggle span { width: 26px; }
-.menu-toggle span:last-child { width: 26px; transform: scaleX(0.78); }
-body[data-page="/kleif-rossar-preview/"] .menu-toggle { border: 0; background: none; }
-.menu-top .close-button { width: 44px; height: 44px; border: 0; border-radius: 0; background: none; font-size: 30px; font-weight: 300; line-height: 1; cursor: pointer; transition: transform 240ms var(--ease-out); }
-@media (hover: hover) and (pointer: fine) {
-  .menu-top .close-button:hover { transform: rotate(90deg); }
-  body[data-page="/kleif-rossar-preview/"] .menu-toggle:not([aria-expanded="true"]):hover span:first-child { transform: translateY(-5px); }
-  body[data-page="/kleif-rossar-preview/"] .menu-toggle:not([aria-expanded="true"]):hover span:last-child { transform: translateY(5px); }
-}
-@media (max-width: 700px) {
-  .menu-toggle { width: 44px; height: 44px; gap: 6px; }
-  .menu-toggle span, .menu-toggle span:last-child { width: 24px; }
-}
-
 /* Stay cards (inner pages, homepage bands): the frame draws in, the photo eases forward, the name underlines */
 .k-stay-photo { clip-path: inset(0 round 5px); transition: clip-path 900ms cubic-bezier(.22, 1, .36, 1); }
 .k-stay-photo img { transition: transform 1400ms cubic-bezier(.22, 1, .36, 1); }
@@ -436,3 +419,23 @@ html.k-js:not(.no-motion) .k-starline.is-in path { stroke-dasharray: 1 1; animat
    translateX(-50%) and left it half a logo right of centre. The logo keeps its centring and only fades. */
 @media (min-width: 701px) { .menu-dialog .menu-top > .brand { transform: translateX(-50%) !important; } }
 @media (max-width: 700px) { .menu-dialog .menu-top > .brand { transform: none !important; } }
+
+/* ONE header on every page (Sindri 10 Nov). Fixed; see-through over the homepage film, solid white elsewhere and once
+   the film is half behind you (site.js toggles .is-solid). Replaces the homepage's second "dock" header and the old
+   white Rossar header. */
+:root { --header: 96px; }
+@media (max-width: 700px) { :root { --header: 96px; } }
+@media (max-width: 600px) { :root { --header: 78px; } }
+.site-header.home-header { position: fixed; transition: background-color 320ms ease, color 320ms ease, box-shadow 320ms ease; }
+.site-header.home-header.is-solid { background: #fff; color: #30382f; box-shadow: 0 1px 0 #e3e6df; }
+.site-header.home-header.is-solid .header-enquiry, .site-header.home-header.is-solid .menu-toggle { color: #30382f; }
+.site-header.home-header .menu-toggle, .home-menu .menu-toggle { border: 0; background: none; }
+.site-header.home-header .brand { top: 50%; transform: translate(-50%, -50%); transition: opacity 320ms ease, visibility 320ms; }
+.site-header.home-header:not(.is-solid) .brand { opacity: 0; }
+.site-header.home-header.is-solid .brand { visibility: visible; opacity: 1; }
+.site-header.home-header .header-left a[aria-current] { text-decoration: underline; text-underline-offset: 6px; }
+@media (max-width: 600px) {
+  .site-header.home-header.is-solid .header-left { display: none; }
+  .site-header.home-header.is-solid .brand { display: block; left: 22px; transform: translateY(-50%); }
+  .site-header.home-header.is-solid .brand .logo { height: 46px; }
+}

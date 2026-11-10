@@ -357,7 +357,8 @@ main > .gallery-section { padding-inline: var(--k-side); max-width: calc(var(--k
 /* iOS pass 10 Nov: date fields keep inside the screen; small links get a 44 px tap area without moving anything */
 .field input[type="date"] { min-width: 0; max-width: 100%; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
 .menu-toggle, .home-dock-toggle { min-height: 44px; }
-.site-header .brand, .menu-top .brand, .header-left a, .header-enquiry, .home-menu-name,
+/* the logo keeps style.css's absolute centring; an absolute box already anchors its ::before */
+.header-left a, .header-enquiry, .home-menu-name,
 .home-footer-main nav a, .k-compare thead a, .contact-intro a { position: relative; }
 .site-header .brand::before, .menu-top .brand::before, .header-left a::before, .header-enquiry::before, .home-menu-name::before,
 .home-footer-main nav a::before, .k-compare thead a::before, .contact-intro a::before { content: ""; position: absolute; }
@@ -366,3 +367,72 @@ main > .gallery-section { padding-inline: var(--k-side); max-width: calc(var(--k
 .site-header .brand::before, .menu-top .brand::before, .header-enquiry::before { inset: 0 -5px; }
 .home-menu-name::before { inset: -9px 0; }
 .k-compare thead a::before, .contact-intro a::before { inset: -12px 0; }
+
+/* Menu button: two lines, no box, on every header (Sindri 10 Nov: "ugly button"), matching the homepage dock.
+   The menu's close button loses its box the same way. */
+.menu-toggle { width: 44px; height: 44px; border: 0; border-radius: 0; background: none; padding: 0; gap: 6px; cursor: pointer; }
+.menu-toggle span { width: 26px; }
+.menu-toggle span:last-child { width: 26px; transform: scaleX(0.78); }
+body[data-page="/kleif-rossar-preview/"] .menu-toggle { border: 0; background: none; }
+.menu-top .close-button { width: 44px; height: 44px; border: 0; border-radius: 0; background: none; font-size: 30px; font-weight: 300; line-height: 1; cursor: pointer; transition: transform 240ms var(--ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  .menu-top .close-button:hover { transform: rotate(90deg); }
+  body[data-page="/kleif-rossar-preview/"] .menu-toggle:not([aria-expanded="true"]):hover span:first-child { transform: translateY(-5px); }
+  body[data-page="/kleif-rossar-preview/"] .menu-toggle:not([aria-expanded="true"]):hover span:last-child { transform: translateY(5px); }
+}
+@media (max-width: 700px) {
+  .menu-toggle { width: 44px; height: 44px; gap: 6px; }
+  .menu-toggle span, .menu-toggle span:last-child { width: 24px; }
+}
+
+/* Stay cards (inner pages, homepage bands): the frame draws in, the photo eases forward, the name underlines */
+.k-stay-photo { clip-path: inset(0 round 5px); transition: clip-path 900ms cubic-bezier(.22, 1, .36, 1); }
+.k-stay-photo img { transition: transform 1400ms cubic-bezier(.22, 1, .36, 1); }
+.k-stay-label h3 { background: linear-gradient(currentColor, currentColor) left 100% / 0% 1px no-repeat; padding-bottom: 3px; transition: background-size 650ms cubic-bezier(.65, 0, .35, 1); }
+@media (hover: hover) and (pointer: fine) {
+  .k-stay:hover .k-stay-photo { clip-path: inset(10px round 3px); }
+  .k-stay:hover .k-stay-photo img { transform: scale(1.07); }
+  .k-stay:hover .k-stay-label h3 { background-size: 100% 1px; }
+}
+.k-stay:focus-visible .k-stay-label h3 { background-size: 100% 1px; }
+
+/* Five stars beside the review headings: each outline draws, then fills, one after another (one time) */
+.k-starline { display: flex; justify-content: center; gap: 12px; margin: 0 auto 26px; color: var(--k-muted); }
+.k-starline svg { width: 22px; height: 22px; overflow: visible; }
+.k-starline path { fill: currentColor; stroke: currentColor; stroke-width: 1.2; stroke-linejoin: round; }
+html.k-js:not(.no-motion) .k-starline:not(.is-in) svg { transform: scale(.7); opacity: 0; }
+html.k-js:not(.no-motion) .k-starline:not(.is-in) path { fill-opacity: 0; stroke-dasharray: 1 1; stroke-dashoffset: 1; }
+html.k-js:not(.no-motion) .k-starline.is-in svg { animation: k-star-pop 620ms cubic-bezier(.34, 1.56, .64, 1) both; animation-delay: calc(var(--i) * 120ms); }
+html.k-js:not(.no-motion) .k-starline.is-in path { stroke-dasharray: 1 1; animation: k-star-draw 700ms cubic-bezier(.65, 0, .35, 1) both, k-star-fill 420ms ease both; animation-delay: calc(var(--i) * 120ms), calc(var(--i) * 120ms + 480ms); }
+@keyframes k-star-pop { from { opacity: 0; transform: scale(.7); } to { opacity: 1; transform: none; } }
+@keyframes k-star-draw { from { stroke-dashoffset: 1; } to { stroke-dashoffset: 0; } }
+@keyframes k-star-fill { from { fill-opacity: 0; } to { fill-opacity: 1; } }
+
+/* Page changes: one quiet cross-fade between pages, the header holding still (replaces the old chalk curtain) */
+@view-transition { navigation: auto; }
+.site-header:not(.home-header) { view-transition-name: k-header; }
+::view-transition-old(root) { animation: 240ms cubic-bezier(.4, 0, 1, 1) both k-vt-out; }
+::view-transition-new(root) { animation: 460ms cubic-bezier(.22, 1, .36, 1) both k-vt-in; }
+::view-transition-group(k-header) { animation-duration: 0s; }
+@keyframes k-vt-out { to { opacity: 0; } }
+@keyframes k-vt-in { from { opacity: 0; transform: translateY(12px); } }
+@media (prefers-reduced-motion: reduce) {
+  @view-transition { navigation: none; }
+  .k-stay-photo, .k-stay-photo img, .k-stay-label h3 { transition: none; }
+}
+.no-motion .k-stay-photo, .no-motion .k-stay-photo img, .no-motion .k-stay-label h3 { transition: none; }
+
+/* Wide photograph bands (Sindri 10 Nov: "more beautiful images across the pages") */
+.k-band { padding: 0 var(--k-side); max-width: calc(1600px + 2 * var(--k-side)); margin: 0 auto; box-sizing: border-box; }
+.k-band-media { aspect-ratio: 21 / 9; }
+.k-band-caption { margin: 14px 0 0; text-align: center; font-size: 13px; color: var(--k-soft); }
+.home-around .k-band { padding: 0; margin-bottom: clamp(36px, 4vw, 56px); }
+@media (max-width: 760px) { .k-band-media { aspect-ratio: 4 / 3; } }
+/* footer: a real photograph, not a thin strip */
+.footer-location > img { height: auto; aspect-ratio: 4 / 3; object-fit: cover; }
+@media (max-width: 700px) { .footer-location > img { height: auto; aspect-ratio: 4 / 3; } }
+
+/* The menu's entrance animation sets transform on every .menu-top child, which threw away the logo's
+   translateX(-50%) and left it half a logo right of centre. The logo keeps its centring and only fades. */
+@media (min-width: 701px) { .menu-dialog .menu-top > .brand { transform: translateX(-50%) !important; } }
+@media (max-width: 700px) { .menu-dialog .menu-top > .brand { transform: none !important; } }

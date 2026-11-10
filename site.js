@@ -15,6 +15,7 @@
     (entries) => entries.forEach((e) => { if (e.isIntersecting) { e.target.classList.add("is-in"); seq.unobserve(e.target); } }),
     { rootMargin: "0px 0px -12% 0px" },
   );
+  $$(".k-starline").forEach((el) => seq.observe(el));
   $$("[data-k-seq]").forEach((el) => {
     [...el.children].forEach((c, i) => c.style.setProperty("--i", i));
     seq.observe(el);

@@ -721,27 +721,34 @@ html.home-text-motion [data-text-order="5"] {
   letter-spacing: -0.025em;
   margin: 0;
 }
+/* Stay card hover (Sindri 10 Nov: "much better"): the frame draws in, the photo eases forward, then the
+   details arrive in order, each rule drawing left to right. Leaving is quicker and needs no stagger. */
+.home-stay-photo { clip-path: inset(0); transition: clip-path 900ms cubic-bezier(0.22, 1, 0.36, 1); }
+.home-stay-photo > img { transition: transform 1400ms cubic-bezier(0.22, 1, 0.36, 1); }
+.home-stay-label h3 { background: linear-gradient(currentColor, currentColor) left 100% / 0% 1px no-repeat; padding-bottom: 3px; transition: background-size 650ms cubic-bezier(0.65, 0, 0.35, 1); }
+.home-stay-label .home-stay-line { margin: 8px 0 0; font-size: 12px; letter-spacing: 0.02em; color: var(--home-muted); }
 @media (hover: hover) and (pointer: fine) {
-  .home-stay-detail {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  .home-stay-link:hover .home-stay-detail,
-  .home-stay-link:focus-visible .home-stay-detail {
-    opacity: 1;
-    transform: none;
-  }
-  .home-stay-link:hover .home-stay-photo > img,
-  .home-stay-link:focus-visible .home-stay-photo > img {
-    transform: scale(1.035);
-  }
-  .home-stay-link:hover .home-stay-arrow svg:first-child {
-    transform: translate3d(125%, -125%, 0);
-  }
-  .home-stay-link:hover .home-stay-arrow svg:last-child {
-    transform: none;
-  }
+  .home-stay-detail { opacity: 0; transform: none; transition: opacity 240ms ease; }
+  .home-stay-detail > * { opacity: 0; transform: translateY(14px); transition: opacity 220ms ease, transform 220ms ease; }
+  .home-stay-facts li { position: relative; border-top-color: transparent; }
+  .home-stay-facts li::before { content: ""; position: absolute; top: -1px; left: 0; right: 0; height: 1px; background: rgba(255, 255, 255, 0.5); transform: scaleX(0); transform-origin: left center; transition: transform 300ms ease; }
+  .home-stay-link:hover .home-stay-photo, .home-stay-link:focus-visible .home-stay-photo { clip-path: inset(12px); }
+  .home-stay-link:hover .home-stay-photo > img, .home-stay-link:focus-visible .home-stay-photo > img { transform: scale(1.08); }
+  .home-stay-link:hover .home-stay-detail, .home-stay-link:focus-visible .home-stay-detail { opacity: 1; transition: opacity 420ms ease 80ms; }
+  .home-stay-link:hover .home-stay-detail > *, .home-stay-link:focus-visible .home-stay-detail > * { opacity: 1; transform: none; transition: opacity 500ms ease, transform 700ms cubic-bezier(0.22, 1, 0.36, 1); }
+  .home-stay-link:hover .home-stay-detail-kicker { transition-delay: 140ms; }
+  .home-stay-link:hover .home-stay-facts { transition-delay: 220ms; }
+  .home-stay-link:hover .home-stay-detail-copy { transition-delay: 320ms; }
+  .home-stay-link:hover .home-stay-facts li::before, .home-stay-link:focus-visible .home-stay-facts li::before { transform: scaleX(1); transition: transform 800ms cubic-bezier(0.65, 0, 0.35, 1) 260ms; }
+  .home-stay-link:hover .home-stay-facts li:nth-child(2)::before { transition-delay: 360ms; }
+  .home-stay-link:hover .home-stay-label h3, .home-stay-link:focus-visible .home-stay-label h3 { background-size: 100% 1px; }
+  .home-stay-link:hover .home-stay-arrow svg:first-child { transform: translate3d(125%, -125%, 0); }
+  .home-stay-link:hover .home-stay-arrow svg:last-child { transform: none; }
 }
+@media (prefers-reduced-motion: reduce) {
+  .home-stay-photo, .home-stay-detail > *, .home-stay-facts li::before, .home-stay-label h3 { transition: none !important; }
+}
+.no-motion .home-stay-photo, .no-motion .home-stay-detail > *, .no-motion .home-stay-facts li::before, .no-motion .home-stay-label h3 { transition: none !important; }
 .home-together {
   border-top: 1px solid #d8ddd5;
   margin-top: 42px;

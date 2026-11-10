@@ -346,3 +346,9 @@ main > .gallery-section { padding-inline: var(--k-side); max-width: calc(var(--k
 .k-time, .k-compare td, .k-room-table td, .k-facts dd, .k-count, .k-filter span { font-variant-numeric: tabular-nums; }
 .k-filter, .k-map-list button, .k-thumb, .k-plan, .k-map-reset, .k-stay, .k-pin { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
 .k-plan-dialog { overscroll-behavior: contain; }
+
+/* phone: the floor plan opens wide enough to read and pans with a finger */
+@media (max-width: 760px) {
+  .k-plan-dialog[open] { overflow: auto; -webkit-overflow-scrolling: touch; }
+  .k-plan-dialog img { width: 200vw; max-width: none; height: auto; padding: 16px; }
+}

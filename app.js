@@ -445,7 +445,7 @@
       const data = new FormData(form),
         value = (name) => String(data.get(name) || "").trim();
       const label = (name) => $(`#${name}`).selectedOptions[0].textContent;
-      enquiryText = `Hello Erla,\n\nI would like to enquire about ${label("occasion").toLowerCase()} at Kleif.\n\nName: ${value("name")}\nEmail: ${value("email")}\n${value("phone") ? `Phone: ${value("phone")}\n` : ""}House: ${label("stay")}\nArrival: ${value("arrival") || "To be discussed"}\nDeparture: ${value("departure") || "To be discussed"}\nOvernight guests: ${value("guests") || "To be discussed"}\n\n${value("message") || "Please let me know about the possibilities for our stay."}\n\nWarm regards,\n${value("name")}`;
+      enquiryText = `Hello Erla,\n\nI would like to enquire about ${label("occasion").toLowerCase()} at Kleif.\n\nName: ${value("name")}\nEmail: ${value("email")}\n${value("phone") ? `Phone: ${value("phone")}\n` : ""}Stay: ${label("stay")}\nArrival: ${value("arrival") || "To be discussed"}\nDeparture: ${value("departure") || "To be discussed"}\nOvernight guests: ${value("guests") || "To be discussed"}\n\n${value("message") || "Please let me know about the possibilities for our stay."}\n\nWarm regards,\n${value("name")}`;
       $("#enquiry-summary").textContent = enquiryText;
       $("#send-enquiry").href =
         `mailto:info@kleif.is?subject=${encodeURIComponent(`Kleif enquiry: ${label("occasion")}`)}&body=${encodeURIComponent(enquiryText)}`;

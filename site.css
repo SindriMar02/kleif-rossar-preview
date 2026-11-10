@@ -393,9 +393,9 @@ html.k-js:not(.no-motion) .k-starline.is-in path { stroke-dasharray: 1 1; animat
 
 /* Page changes: one quiet cross-fade between pages, the header holding still (replaces the old chalk curtain) */
 @view-transition { navigation: auto; }
-.site-header:not(.home-header) { view-transition-name: k-header; }
-::view-transition-old(root) { animation: 240ms cubic-bezier(.4, 0, 1, 1) both k-vt-out; }
-::view-transition-new(root) { animation: 460ms cubic-bezier(.22, 1, .36, 1) both k-vt-in; }
+.site-header.home-header.is-solid { view-transition-name: k-header; }
+::view-transition-old(root) { animation: 170ms cubic-bezier(.4, 0, 1, 1) both k-vt-out; }
+::view-transition-new(root) { animation: 420ms cubic-bezier(.22, 1, .36, 1) 110ms both k-vt-in; }
 ::view-transition-group(k-header) { animation-duration: 0s; }
 @keyframes k-vt-out { to { opacity: 0; } }
 @keyframes k-vt-in { from { opacity: 0; transform: translateY(12px); } }
@@ -439,3 +439,46 @@ html.k-js:not(.no-motion) .k-starline.is-in path { stroke-dasharray: 1 1; animat
   .site-header.home-header.is-solid .brand { display: block; left: 22px; transform: translateY(-50%); }
   .site-header.home-header.is-solid .brand .logo { height: 46px; }
 }
+
+/* ---- Codex design audit fixes, 10 Nov ---- */
+/* phone: with Stay/Our story hidden, Enquire and the menu button stay on the right, clear of the logo */
+.site-header.home-header .header-right { margin-left: auto; }
+/* the open menu is the header row expanding: logo in the centre where it was, the X where the button was */
+.home-menu-top { position: relative; }
+.home-menu-mark { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); line-height: 0; font-size: 0; }
+.home-menu-mark .logo { height: 59px; width: auto; }
+@media (max-width: 600px) {
+  .home-menu-mark { left: 22px; transform: translateY(-50%); }
+  .home-menu-mark .logo { height: 46px; }
+  /* a dropdown on phones too, not a full screen: the page stays visible beneath */
+  .home-menu { height: auto; max-height: calc(100dvh - 40px); }
+  .home-menu-content { max-height: calc(100dvh - 40px - 78px); }
+}
+/* running text in the sans; the display serif stays for headings */
+.k-prose-large { font-family: var(--sans); font-weight: 400; font-size: clamp(17px, 1.3vw, 19px); line-height: 1.75; letter-spacing: 0; color: #3d4239; max-width: 62ch; }
+/* gallery: photographs in the first view, a few large plates among the details */
+.k-hero-compact { padding-top: calc(var(--header) + clamp(32px, 4vw, 56px)); }
+.k-gallery { grid-auto-flow: dense; }
+.k-tile.is-feature { grid-column: span 2; grid-row: span 2; aspect-ratio: auto; }
+@media (max-width: 760px) { .k-tile.is-feature { grid-row: span 1; aspect-ratio: 4 / 3; } }
+/* reviews: show more */
+.k-more-wrap { margin: 8px 0 0; }
+.k-more[hidden] { display: none; }
+/* two cards in a row (related stays, retreats and events) */
+.home-stay-grid.is-two { grid-template-columns: repeat(2, minmax(0, 1fr)); max-width: 1000px; margin-inline: auto; }
+@media (max-width: 600px) { .home-stay-grid.is-two { grid-template-columns: minmax(0, 1fr); } }
+/* contact form: the same quiet underlined fields as the homepage form */
+.form-panel .field input, .form-panel .field select, .form-panel .field textarea { border: 0; border-bottom: 1px solid #d8ddd5; border-radius: 0; background: transparent; padding-left: 0; padding-right: 0; }
+.form-panel .field input:focus-visible, .form-panel .field select:focus-visible, .form-panel .field textarea:focus-visible { outline: none; border-bottom-color: #30382f; box-shadow: 0 1px 0 #30382f; }
+/* the X keeps the menu button's place at the right when the logo is centred above the flow */
+.home-menu-control { margin-left: auto; }
+@media (max-width: 600px) {
+  /* a short dropdown on phones: the links and the contact line, without the feature photograph */
+  .home-menu .home-menu-feature { display: none; }
+}
+/* gallery: a smaller opening so the first photographs sit in the first view */
+.k-hero-compact .display { font-size: clamp(40px, 4.6vw, 72px); }
+.k-hero-compact .k-head { margin-bottom: 26px; }
+.k-hero-compact .k-lede { margin-top: 16px; }
+.k-gallery-section { padding-top: 24px !important; }
+.k-gallery-section .k-filters { margin-bottom: 24px; }

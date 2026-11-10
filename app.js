@@ -235,28 +235,22 @@
           filter: `blur(${blur}px)`,
           scale: guard,
         });
-        gsap.to(img, {
+        // Codex audit 10 Nov: a scroll scrub left a photograph soft whenever the visitor stopped
+        // half way. Once the frame is well into view it now resolves on a timer and always finishes.
+        const resolve = gsap.to(img, {
           opacity: 1,
           filter: "blur(0px)",
           scale: 1,
-          ease: "none",
-          scrollTrigger: {
-            trigger: frame,
-            start: "top bottom",
-            end: "top 48%",
-            scrub: true,
-            // will-change holds a compositor layer, so it belongs to the
-            // photograph that is actually resolving — not to all thirteen on
-            // the page for the whole visit.
-            onEnter: () => gsap.set(img, { willChange: "opacity, filter" }),
-            onLeave: (self) => {
-              self.kill();
-              // Blur is paint-level work; it must not outlive the reveal.
-              gsap.set(img, {
-                clearProps: "opacity,filter,transform,willChange",
-              });
-            },
-          },
+          duration: 1.1,
+          ease: "power2.out",
+          paused: true,
+          onComplete: () => gsap.set(img, { clearProps: "opacity,filter,transform,willChange" }),
+        });
+        ScrollTrigger.create({
+          trigger: frame,
+          start: "top 88%",
+          once: true,
+          onEnter: () => { gsap.set(img, { willChange: "opacity, filter" }); resolve.play(); },
         });
       });
       // Entrance travel is confined to the image masks; page flow is never pinned.

@@ -90,12 +90,16 @@
       const want = button.dataset.kFilter;
       let shown = 0;
       const entering = [];
+      const page = +list.dataset.kPage || 0;
+      list.dataset.kLimit = page;
       [...list.children].forEach((item) => {
         const match = want === "all" || item.dataset.kGroup === want;
-        if (match) { if (item.hidden) entering.push(item); item.hidden = false; shown++; }
+        if (match) { shown++; const over = page && shown > page; if (item.hidden && !over) entering.push(item); item.hidden = over; }
         else item.hidden = true;
       });
-      count.textContent = `${shown} ${shown === 1 ? noun[0] : noun[1]}`;
+      const more = $("[data-k-more]", section);
+      if (more) more.hidden = !(page && shown > page);
+      count.textContent = page && shown > page ? `Showing ${page} of ${shown} ${noun[1]}` : `${shown} ${shown === 1 ? noun[0] : noun[1]}`;
       const url = new URL(location.href);
       if (want === "all") url.searchParams.delete("show"); else url.searchParams.set("show", want);
       history.replaceState(history.state, "", url);
@@ -107,6 +111,21 @@
       }
       refresh();
     });
+  });
+
+  // reviews: the first page on load, then "Show more reviews" adds the next 18 (all stay on the page, no accordion)
+  $$("[data-k-page]").forEach((list) => {
+    const section = list.closest("section"), page = +list.dataset.kPage, more = $("[data-k-more]", section), count = $("[data-k-count]", section);
+    const visibleMatches = () => { const want = $('[data-k-filter][aria-pressed="true"]', section)?.dataset.kFilter || "all"; return [...list.children].filter((i) => want === "all" || i.dataset.kGroup === want); };
+    const apply = (limit) => {
+      const items = visibleMatches(); list.dataset.kLimit = limit;
+      items.forEach((i, n) => { const show = n < limit; if (show && i.hidden && !still()) i.animate([{ opacity: 0, transform: "translateY(10px)" }, { opacity: 1, transform: "none" }], { duration: 360, delay: Math.min(n - (limit - page), 12) * 22, easing: "cubic-bezier(.23,1,.32,1)", fill: "backwards" }); i.hidden = !show; });
+      more.hidden = items.length <= limit;
+      count.textContent = items.length > limit ? `Showing ${limit} of ${items.length} reviews` : `${items.length} reviews`;
+      refresh();
+    };
+    apply(page);
+    more.addEventListener("click", () => apply(+list.dataset.kLimit + page));
   });
 
   // a shared link opens on the same filter (?show=barn)

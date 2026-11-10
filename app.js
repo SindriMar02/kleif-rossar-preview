@@ -432,42 +432,8 @@
     }
     arrival.addEventListener("input", validateDates);
     departure.addEventListener("input", validateDates);
-    let enquiryText = "";
-    form.addEventListener("submit", (event) => {
-      event.preventDefault();
-      if (!validateDates() || !form.reportValidity()) return;
-      const data = new FormData(form),
-        value = (name) => String(data.get(name) || "").trim();
-      const label = (name) => $(`#${name}`).selectedOptions[0].textContent;
-      enquiryText = `Hello Erla,\n\nI would like to enquire about ${label("occasion").toLowerCase()} at Kleif.\n\nName: ${value("name")}\nEmail: ${value("email")}\n${value("phone") ? `Phone: ${value("phone")}\n` : ""}Stay: ${label("stay")}\nArrival: ${value("arrival") || "To be discussed"}\nDeparture: ${value("departure") || "To be discussed"}\nOvernight guests: ${value("guests") || "To be discussed"}\n\n${value("message") || "Please let me know about the possibilities for our stay."}\n\nWarm regards,\n${value("name")}`;
-      $("#enquiry-summary").textContent = enquiryText;
-      $("#send-enquiry").href =
-        `mailto:info@kleif.is?subject=${encodeURIComponent(`Kleif enquiry: ${label("occasion")}`)}&body=${encodeURIComponent(enquiryText)}`;
-      form.hidden = true;
-      $("#enquiry-result").hidden = false;
-      $("#result-heading").focus({ preventScroll: true });
-      $("#enquiry-result").scrollIntoView({
-        block: "center",
-        behavior: "instant",
-      });
-      window.ScrollTrigger?.refresh();
-    });
-    $("#edit-enquiry").addEventListener("click", () => {
-      form.hidden = false;
-      $("#enquiry-result").hidden = true;
-      $("#name").focus();
-      window.ScrollTrigger?.refresh();
-    });
-    $("#copy-enquiry").addEventListener("click", async () => {
-      try {
-        await navigator.clipboard.writeText(enquiryText);
-        $("#copy-status").textContent =
-          "Message copied. Paste it into your email to info@kleif.is.";
-      } catch {
-        $("#copy-status").textContent =
-          "Copy was not available. Select and copy the message above, or use Open email app.";
-      }
-    });
+    // Sending lives in site.js (the sndr-contact relay); this block only prefills and checks dates.
+    window.kleifValidateDates = validateDates;
   }
   function runIntro() {
     const root = document.documentElement;

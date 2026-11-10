@@ -78,6 +78,49 @@
     $$('a[href^="#"]', menu).forEach((a) => a.addEventListener("click", () => closeMenu(true)));
   }
 
+  // ---- enquiries: both forms post to the studio relay, which answers ok only when the mail is sent ----
+  const RELAY = "https://sndr-contact.sindri-381.workers.dev/";
+  const sendForms = [
+    { form: $("#enquiry-form"), done: $("#enquiry-result"), fields: { name: "name", email: "email", phone: "phone", message: "message", guests: "guests", arrival: "arrival", departure: "departure" }, selects: { occasion: "occasion", stay: "stay" } },
+    { form: $("#home-enquiry"), done: $("#home-sent"), fields: { name: "name", email: "email", message: "message", guests: "guests", dates: "dates" }, selects: { stay: "space" } },
+  ].filter((f) => f.form);
+  sendForms.forEach(({ form, done, fields, selects }) => {
+    const error = $(".k-form-error", form);
+    const button = $('button[type="submit"]', form);
+    const label = $("span", button);
+    const original = label.textContent;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (window.kleifValidateDates && form.id === "enquiry-form" && !window.kleifValidateDates()) return;
+      if (!form.reportValidity()) return;
+      const data = new FormData(form);
+      const body = { site: "kleif", page: location.pathname, _honey: String(data.get("_honey") || "") };
+      Object.entries(fields).forEach(([k, name]) => { body[k] = String(data.get(name) || "").trim(); });
+      Object.entries(selects).forEach(([k, name]) => { const sel = form.elements[name]; if (sel) body[k] = sel.selectedOptions[0]?.textContent.trim() || ""; });
+      error.hidden = true;
+      button.disabled = true;
+      label.textContent = "Sending…";
+      try {
+        const res = await fetch(RELAY, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+        const out = await res.json().catch(() => ({}));
+        if (!res.ok || !out.ok) throw new Error(out.reason || String(res.status));
+        $("[data-k-sent-email]", done).textContent = body.email;
+        form.hidden = true;
+        done.hidden = false;
+        $("h3", done).focus({ preventScroll: true });
+        done.scrollIntoView({ block: "center", behavior: still() ? "auto" : "smooth" });
+      } catch (e) {
+        error.textContent = "Your enquiry did not go through. Please try again, or write to info@kleif.is or call +354 847 7779.";
+        error.hidden = false;
+      } finally {
+        button.disabled = false;
+        label.textContent = original;
+        refresh();
+      }
+    });
+    $("[data-k-again]", done)?.addEventListener("click", () => { form.reset(); done.hidden = true; form.hidden = false; $("input", form)?.focus(); refresh(); });
+  });
+
   // ---- filters: gallery and reviews ----
   $$("[data-k-filter]").forEach((button) => {
     const section = button.closest("section");

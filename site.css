@@ -482,3 +482,11 @@ html.k-js:not(.no-motion) .k-starline.is-in path { stroke-dasharray: 1 1; animat
 .k-hero-compact .k-lede { margin-top: 16px; }
 .k-gallery-section { padding-top: 24px !important; }
 .k-gallery-section .k-filters { margin-bottom: 24px; }
+
+/* enquiry forms: a hidden trap field for bots, a calm error, and the thank-you */
+.k-honey { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+.k-form-error { margin: 18px 0 0; padding: 14px 16px; border-left: 2px solid var(--k-route); background: #fbf3ef; color: #5a2a17; font-size: 14px; line-height: 1.5; }
+.k-sent h3 { font-family: var(--display); font-weight: 300; font-size: clamp(28px, 2.6vw, 40px); letter-spacing: -0.03em; margin: 0 0 14px; outline: none; }
+.k-sent p { margin: 0 0 22px; color: #4b5146; }
+.home-sent { padding: 32px 0; }
+button[type="submit"][disabled] { opacity: .6; cursor: progress; }

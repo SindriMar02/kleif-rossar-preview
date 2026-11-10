@@ -304,19 +304,6 @@
       document.querySelector("#home-space").value = a.dataset.enquireSpace;
     }),
   );
-  const form = document.querySelector("#home-enquiry");
-  form.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!form.reportValidity()) return;
-    const data = new FormData(form),
-      v = (n) => String(data.get(n) || "").trim();
-    const space =
-      document.querySelector("#home-space").selectedOptions[0].textContent;
-    const message = `Hello Erla,\n\nI would like to enquire about ${space.toLowerCase()} at Kleif.\n\nName: ${v("name")}\nEmail: ${v("email")}\nGuests: ${v("guests") || "To be discussed"}\nDates: ${v("dates") || "Flexible"}\n\n${v("message") || "Please tell me about the possibilities for our visit."}\n\nWarm regards,\n${v("name")}`;
-    const link = document.querySelector("#home-email-link");
-    link.href = `mailto:info@kleif.is?subject=${encodeURIComponent("A visit to Kleif: " + space)}&body=${encodeURIComponent(message)}`;
-    document.querySelector("#home-email-ready").hidden = false;
-    link.focus();
-  });
+  // the enquiry form is sent by site.js (sndr-contact relay)
 
 })();

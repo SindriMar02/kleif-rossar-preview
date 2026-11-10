@@ -1,3 +1,14 @@
+/* focus-guard (_tools/focus-guard): no focus ring after a tap or click; the README says why */
+(function () {
+  var root = document.documentElement;
+  function set(v) { if (root.getAttribute('data-input') !== v) root.setAttribute('data-input', v); }
+  addEventListener('pointerdown', function () { set('pointer'); }, true);
+  addEventListener('keydown', function (e) {
+    if (e.key === 'Shift' || e.key === 'Control' || e.key === 'Alt' || e.key === 'Meta') return;
+    set('key');
+  }, true);
+})();
+
 (() => {
   "use strict";
   const $ = (s, root = document) => root.querySelector(s);
@@ -273,7 +284,8 @@
     dialog.showModal();
     document.body.classList.add("dialog-open");
     lenis?.stop();
-    $(".close-button", dialog)?.focus({ preventScroll: true });
+    // Pointer opens focus the dialog itself (no ring on Safari/iOS); keyboard opens the close button.
+    (event?.detail === 0 ? $(".close-button", dialog) : dialog)?.focus({ preventScroll: true });
   }
   // The menu's exit is a CSS transition held open by allow-discrete on
   // display/overlay, so a plain close still plays it and Escape needs no
@@ -343,7 +355,9 @@
     const name = galleryNames[galleryIndex],
       p = photoData[name],
       img = $("#lightbox-image");
-    img.src = `/kleif-rossar-preview/assets/img/${name}.${p[5] || "webp"}`;
+    img.removeAttribute("srcset");
+    img.src = p[6] || `/kleif-rossar-preview/assets/img/${name}.${p[5] || "webp"}`;
+    if (p[7]) { img.sizes = "92vw"; img.srcset = p[7]; }
     img.alt = p[2];
     img.width = p[0];
     img.height = p[1];
@@ -358,7 +372,7 @@
   };
   $$("[data-photo]").forEach((button) =>
     button.addEventListener("click", (event) => {
-      const scope = button.closest(".photo-rail,.gallery-grid");
+      const scope = button.closest(".photo-rail,.gallery-grid,[data-lightbox-group]");
       galleryNames = $$("[data-photo]", scope)
         .filter((el) => !el.hidden)
         .map((el) => el.dataset.photo);
@@ -434,7 +448,7 @@
       enquiryText = `Hello Erla,\n\nI would like to enquire about ${label("occasion").toLowerCase()} at Kleif.\n\nName: ${value("name")}\nEmail: ${value("email")}\n${value("phone") ? `Phone: ${value("phone")}\n` : ""}House: ${label("stay")}\nArrival: ${value("arrival") || "To be discussed"}\nDeparture: ${value("departure") || "To be discussed"}\nOvernight guests: ${value("guests") || "To be discussed"}\n\n${value("message") || "Please let me know about the possibilities for our stay."}\n\nWarm regards,\n${value("name")}`;
       $("#enquiry-summary").textContent = enquiryText;
       $("#send-enquiry").href =
-        `mailto:info@kleif.is?subject=${encodeURIComponent(`Kleif enquiry — ${label("occasion")}`)}&body=${encodeURIComponent(enquiryText)}`;
+        `mailto:info@kleif.is?subject=${encodeURIComponent(`Kleif enquiry: ${label("occasion")}`)}&body=${encodeURIComponent(enquiryText)}`;
       form.hidden = true;
       $("#enquiry-result").hidden = false;
       $("#result-heading").focus({ preventScroll: true });

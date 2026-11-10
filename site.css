@@ -348,7 +348,21 @@ main > .gallery-section { padding-inline: var(--k-side); max-width: calc(var(--k
 .k-plan-dialog { overscroll-behavior: contain; }
 
 /* phone: the floor plan opens wide enough to read and pans with a finger */
+.k-plan-scroll { min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.k-plan-scroll img { display: block; }
 @media (max-width: 760px) {
-  .k-plan-dialog[open] { overflow: auto; -webkit-overflow-scrolling: touch; }
   .k-plan-dialog img { width: 200vw; max-width: none; height: auto; padding: 16px; }
 }
+
+/* iOS pass 10 Nov: date fields keep inside the screen; small links get a 44 px tap area without moving anything */
+.field input[type="date"] { min-width: 0; max-width: 100%; box-sizing: border-box; -webkit-appearance: none; appearance: none; }
+.menu-toggle, .home-dock-toggle { min-height: 44px; }
+.site-header .brand, .menu-top .brand, .header-left a, .header-enquiry, .home-menu-name,
+.home-footer-main nav a, .k-compare thead a, .contact-intro a { position: relative; }
+.site-header .brand::before, .menu-top .brand::before, .header-left a::before, .header-enquiry::before, .home-menu-name::before,
+.home-footer-main nav a::before, .k-compare thead a::before, .contact-intro a::before { content: ""; position: absolute; }
+/* only the short side grows, so neighbouring targets never overlap */
+.header-left a::before, .home-footer-main nav a::before { inset: 0 -11px; }
+.site-header .brand::before, .menu-top .brand::before, .header-enquiry::before { inset: 0 -5px; }
+.home-menu-name::before { inset: -9px 0; }
+.k-compare thead a::before, .contact-intro a::before { inset: -12px 0; }

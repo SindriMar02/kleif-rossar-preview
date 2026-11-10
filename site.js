@@ -73,6 +73,7 @@
         big.alt = img.alt;
         big.width = img.width; big.height = img.height;
         $("#k-plan-title").textContent = $("span", b).textContent.replace(/^Open the /, "").trim();
+        const scroller = $(".k-plan-scroll", planDialog); if (scroller) scroller.scrollLeft = scroller.scrollTop = 0;
         opener = b;
         // reopening during the close animation cancels the close instead of losing the click
         if (closeTimer) { clearTimeout(closeTimer); closeTimer = 0; planDialog.classList.remove("is-closing"); }
@@ -84,7 +85,7 @@
     );
     $(".close-button", planDialog).addEventListener("click", (e) => { e.stopImmediatePropagation(); close(); });
     planDialog.addEventListener("cancel", (e) => { e.preventDefault(); close(); });
-    planDialog.addEventListener("click", (e) => { if (e.target === planDialog || e.target.id === "k-plan-image") close(); });
+    planDialog.addEventListener("click", (e) => { if (e.target === planDialog) close(); });
     planDialog.addEventListener("close", () => { document.body.classList.remove("dialog-open"); opener?.focus({ preventScroll: true }); });
   }
 
@@ -109,11 +110,10 @@
       const a = aspect();
       let w = Math.max(b.w, minW), h = Math.max(b.h, minW / a);
       if (w / h > a) h = w / a; else w = h * a;
-      if (w > W) { w = W; h = w / a; }
-      if (h > H) { h = H; w = h * a; }
       let x = b.x + b.w / 2 - w / 2, y = b.y + b.h / 2 - h / 2;
-      x = Math.min(Math.max(x, 0), Math.max(0, W - w));
-      y = Math.min(Math.max(y, 0), Math.max(0, H - h));
+      // inside the map where it fits; centred on the subject where it cannot
+      if (w <= W) x = Math.min(Math.max(x, 0), W - w);
+      if (h <= H) y = Math.min(Math.max(y, 0), H - h);
       return { x, y, w, h };
     };
     const whole = () => {

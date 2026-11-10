@@ -111,6 +111,14 @@
   document.addEventListener("visibilitychange", syncFilm);
   addEventListener("pagehide", () => video.pause());
   addEventListener("pageshow", syncFilm);
+  // iOS Safari (iPhone 17 Pro simulator, iOS 26.5, 10 Nov 2026) chose the 1080p <source> on a 402 px screen.
+  // Where the media rule says phone, load the lighter encode the element already names.
+  const phoneSource = video.querySelector("source[media]");
+  if (motionAllowed() && phoneSource && matchMedia(phoneSource.media).matches && video.currentSrc && !video.currentSrc.endsWith(phoneSource.getAttribute("src").split("/kleif-rossar-preview/").pop())) {
+    video.src = phoneSource.src;
+    video.load();
+    video.play().catch(() => {});
+  }
   if (motionAllowed() && !document.hidden) {
     openingHold = true;
     document.body.classList.add("home-opening");
